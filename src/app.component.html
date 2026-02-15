@@ -1,0 +1,93 @@
+<div class="flex h-screen bg-gray-100">
+  
+  <!-- Sidebar -->
+  <aside class="w-64 bg-slate-900 text-white flex flex-col shadow-xl z-10">
+    <div class="h-16 flex items-center justify-center border-b border-slate-800 bg-slate-850">
+      <div class="flex items-center space-x-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+        </svg>
+        <span class="text-xl font-bold tracking-wider">ROTO<span class="text-blue-500">SYS</span></span>
+      </div>
+    </div>
+
+    <nav class="flex-1 px-2 py-6 space-y-2 overflow-y-auto">
+      <a (click)="setView('dashboard')" 
+         class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors"
+         [class.bg-slate-800]="currentView() === 'dashboard'"
+         [class.text-white]="currentView() === 'dashboard'"
+         [class.text-slate-300]="currentView() !== 'dashboard'"
+         [class.hover:bg-slate-800]="currentView() !== 'dashboard'"
+         [class.hover:text-white]="currentView() !== 'dashboard'">
+        <svg class="mr-3 flex-shrink-0 h-6 w-6" [class.text-blue-500]="currentView() === 'dashboard'" [class.text-slate-400]="currentView() !== 'dashboard'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+        </svg>
+        Dashboard
+      </a>
+
+      <a (click)="setView('production')" 
+         class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors"
+         [class.bg-slate-800]="currentView() === 'production'"
+         [class.text-white]="currentView() === 'production'"
+         [class.text-slate-300]="currentView() !== 'production'"
+         [class.hover:bg-slate-800]="currentView() !== 'production'"
+         [class.hover:text-white]="currentView() !== 'production'">
+        <svg class="mr-3 flex-shrink-0 h-6 w-6" [class.text-blue-500]="currentView() === 'production'" [class.text-slate-400]="currentView() !== 'production'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Registrar Producción
+      </a>
+
+      <a (click)="setView('inventory')" 
+         class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors"
+         [class.bg-slate-800]="currentView() === 'inventory'"
+         [class.text-white]="currentView() === 'inventory'"
+         [class.text-slate-300]="currentView() !== 'inventory'"
+         [class.hover:bg-slate-800]="currentView() !== 'inventory'"
+         [class.hover:text-white]="currentView() !== 'inventory'">
+        <svg class="mr-3 flex-shrink-0 h-6 w-6" [class.text-blue-500]="currentView() === 'inventory'" [class.text-slate-400]="currentView() !== 'inventory'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+        Inventario
+      </a>
+
+      <a (click)="setView('recipes')" 
+         class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors"
+         [class.bg-slate-800]="currentView() === 'recipes'"
+         [class.text-white]="currentView() === 'recipes'"
+         [class.text-slate-300]="currentView() !== 'recipes'"
+         [class.hover:bg-slate-800]="currentView() !== 'recipes'"
+         [class.hover:text-white]="currentView() !== 'recipes'">
+        <svg class="mr-3 flex-shrink-0 h-6 w-6" [class.text-blue-500]="currentView() === 'recipes'" [class.text-slate-400]="currentView() !== 'recipes'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        Recetas / Config
+      </a>
+    </nav>
+
+    <div class="p-4 border-t border-slate-800">
+      <div class="flex items-center">
+        <div class="ml-3">
+          <p class="text-sm font-medium text-white">Admin</p>
+          <p class="text-xs font-medium text-slate-400">Planta Principal</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto focus:outline-none bg-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      @if (currentView() === 'dashboard') {
+        <app-dashboard />
+      } @else if (currentView() === 'production') {
+        <app-production />
+      } @else if (currentView() === 'inventory') {
+        <app-inventory-view />
+      } @else if (currentView() === 'recipes') {
+        <app-recipes />
+      }
+    </div>
+  </main>
+</div>

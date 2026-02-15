@@ -1,0 +1,5 @@
+{
+  "name": "Sistema de Inventario Rotomoldeo",
+  "description": "Sistema de gestión de inventario para fábrica de plásticos, controlando materia prima, recetas de productos y órdenes de producción.",
+  "requestFramePermissions": []
+}
