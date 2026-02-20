@@ -42,15 +42,42 @@ import { InventoryService, RawMaterial } from '../../services/inventory.service'
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Color</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Stock Actual</th>
+                <th (click)="sortData('color')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors group select-none">
+                  <div class="flex items-center space-x-1">
+                    <span>Color</span>
+                    @if (sortColumn === 'color') {
+                      <span>{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                    } @else {
+                      <span class="opacity-0 group-hover:opacity-50 text-gray-400">↕</span>
+                    }
+                  </div>
+                </th>
+                <th (click)="sortData('stock')" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors group select-none">
+                   <div class="flex items-center justify-end space-x-1">
+                    <span>Stock Actual</span>
+                    @if (sortColumn === 'stock') {
+                      <span>{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                    } @else {
+                      <span class="opacity-0 group-hover:opacity-50 text-gray-400">↕</span>
+                    }
+                  </div>
+                </th>
                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Alerta (Mín)</th>
-                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                <th (click)="sortData('status')" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors group select-none">
+                  <div class="flex items-center justify-center space-x-1">
+                    <span>Estado</span>
+                    @if (sortColumn === 'status') {
+                      <span>{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                    } @else {
+                      <span class="opacity-0 group-hover:opacity-50 text-gray-400">↕</span>
+                    }
+                  </div>
+                </th>
                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              @for (item of inventory.rawMaterials(); track item.id) {
+              @for (item of sortedMaterials; track item.id) {
                 <tr class="hover:bg-gray-50 transition-colors">
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ item.colorName }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-right">{{ item.currentStockKg | number:'1.0-2' }} kg</td>
@@ -171,7 +198,7 @@ import { InventoryService, RawMaterial } from '../../services/inventory.service'
 })
 export class InventoryViewComponent {
   inventory = inject(InventoryService);
-  
+
   // Create State
   showAddMaterial = false;
   newMaterialColor = '';
@@ -249,5 +276,49 @@ export class InventoryViewComponent {
     } finally {
       this.isSavingEdit = false;
     }
+  }
+
+  // --- Sorting Logic ---
+  sortColumn: 'color' | 'stock' | 'status' | null = null;
+  sortDirection: 'asc' | 'desc' = 'asc';
+
+  sortData(column: 'color' | 'stock' | 'status') {
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+  }
+
+  get sortedMaterials() {
+    const items = [...this.inventory.rawMaterials()];
+    if (!this.sortColumn) return items;
+
+    return items.sort((a, b) => {
+      let valA: any, valB: any;
+
+      switch (this.sortColumn) {
+        case 'color':
+          valA = a.colorName.toLowerCase();
+          valB = b.colorName.toLowerCase();
+          break;
+        case 'stock':
+          valA = a.currentStockKg;
+          valB = b.currentStockKg;
+          break;
+        case 'status':
+          // Status Priority: Low Stock (1) < OK (2)
+          const statusA = a.currentStockKg <= a.alertThresholdKg ? 1 : 2;
+          const statusB = b.currentStockKg <= b.alertThresholdKg ? 1 : 2;
+          valA = statusA;
+          valB = statusB;
+          break;
+      }
+
+      if (valA < valB) return this.sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return this.sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
   }
 }

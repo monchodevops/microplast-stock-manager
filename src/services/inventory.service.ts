@@ -116,7 +116,7 @@ export class InventoryService {
   async addRawMaterialStock(colorName: string, amountKg: number) {
     // 1. Check existing
     const existing = this.rawMaterials().find(m => m.colorName.toLowerCase() === colorName.toLowerCase());
-    
+
     try {
       if (existing) {
         // Update
@@ -161,10 +161,10 @@ export class InventoryService {
       // 1. Update Table
       const { error } = await supabase
         .from('raw_materials')
-        .update({ 
-          current_stock_kg: newStockKg, 
+        .update({
+          current_stock_kg: newStockKg,
           alert_threshold_kg: newThresholdKg,
-          last_updated: new Date() 
+          last_updated: new Date()
         })
         .eq('id', id);
 
@@ -259,9 +259,9 @@ export class InventoryService {
     const totalNeededKg = quantity * product.consumptionPerUnitKg;
 
     if (material.currentStockKg < totalNeededKg) {
-      return { 
-        success: false, 
-        message: `Stock insuficiente. Necesario: ${totalNeededKg.toFixed(2)}kg, Disponible: ${material.currentStockKg.toFixed(2)}kg` 
+      return {
+        success: false,
+        message: `Stock insuficiente. Necesario: ${totalNeededKg.toFixed(2)}kg, Disponible: ${material.currentStockKg.toFixed(2)}kg`
       };
     }
 
@@ -269,13 +269,13 @@ export class InventoryService {
       // 2. Perform DB Updates
       // Note: Ideally this would be a Postgres Transaction or RPC function to ensure atomicity.
       // For this implementation, we will chain them sequentially.
-      
+
       // A. Deduct Material
       const { error: matError } = await supabase
         .from('raw_materials')
         .update({ current_stock_kg: material.currentStockKg - totalNeededKg })
         .eq('id', material.id);
-      
+
       if (matError) throw matError;
 
       // B. Add Finished Good
@@ -319,5 +319,138 @@ export class InventoryService {
       // In a real app, we might need to rollback here manually if step A succeeded but B failed.
       return { success: false, message: 'Error de base de datos: ' + (err.message || 'Desconocido') };
     }
+  }
+
+  // --- Production Reports Logic ---
+
+  /**
+   * Registra que se ha generado un nuevo reporte impreso.
+   * Esto marca un nuevo "punto de corte" para el cálculo de novedades.
+   */
+  async registerProductionReport(): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('production_report_logs')
+        .insert({
+          production_date: new Date().toISOString().split('T')[0], // YYYY-MM-DD
+          generated_at: new Date()
+        });
+
+      if (error) throw error;
+    } catch (err) {
+      console.error('Error registrando reporte de producción:', err);
+      throw err;
+    }
+  }
+
+  /**
+   * Obtiene las estadísticas para el reporte de producción del día.
+   * Calcula totales del día y "novedades" (delta) desde el último reporte impreso.
+   */
+  async getProductionReportStatistics() {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+
+      // 1. Obtener último reporte generado hoy (para saber el punto de corte)
+      const { data: lastReport } = await supabase
+        .from('production_report_logs')
+        .select('generated_at')
+        .eq('production_date', today)
+        .order('generated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const cutoffTime = lastReport ? new Date(lastReport.generated_at) : new Date(`${today}T00:00:00`);
+
+      // 2. Obtener logs de producción del día (Solo OUTPUTS / Producción realizada)
+      // Buscamos transacciones de tipo 'PRODUCTION_RUN' creadas hoy
+      // IMPORTANTE: Manejo de Timezones.
+      // Si el usuario genera reporte el "2026-02-19" (Local), en UTC podría ser ya 20 por la hora.
+      // Los registros en DB están en UTC.
+      // ESTRATEGIA: Buscar un rango amplio que cubra "el día local" convertido a UTC.
+
+      const now = new Date();
+      // Inicio del día LOCAL convertido a UTC String
+      const startLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+      // Fin del día LOCAL convertido a UTC String
+      const endLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+
+      const startOfDay = startLocal.toISOString();
+      const endOfDay = endLocal.toISOString();
+
+      console.log('Fetching logs between:', startOfDay, endOfDay);
+
+      const { data: logs, error } = await supabase
+        .from('production_logs')
+        .select('*')
+        .eq('transaction_type', 'PRODUCTION_RUN')
+        .gte('created_at', startOfDay)
+        .lte('created_at', endOfDay);
+
+      if (error) {
+        console.error('Error fetching production logs:', error);
+        return [];
+      }
+
+      console.log('Logs found:', logs?.length, logs);
+
+      if (!logs) return [];
+
+      // 3. Procesar y Agrupar por Producto/Color
+      // Estructura deseada: { key: "ProdId-Color", totalDay: 0, newSinceCutoff: 0, ...metadata }
+      const statsMap = new Map<string, any>();
+
+      for (const log of logs) {
+        // Parsear descripción para extraer producto y color (Un poco frágil, idealmente guardaríamos IDs en logs o relational table)
+        // Formato actual: "Producción: {quantity}u de {product.name} ({colorName})"
+        // Regex simple para extraer. Si falla, agrupamos como "Desconocido".
+        const quantity = Math.abs(log.amount_change / (this.getConsumptionPerUnit(log.description) || 1)); // Estimación reversa o parseo directo
+
+        // Parsing más robusto basado en el texto del log actual:
+        // "Producción: 10u de Maceta (Rojo)"
+        const match = log.description.match(/Producción: (\d+)u de (.*?) \((.*?)\)/);
+
+        if (match) {
+          const qty = parseInt(match[1], 10);
+          const prodName = match[2];
+          const colorName = match[3];
+          const key = `${prodName}-${colorName}`;
+          const logTime = new Date(log.created_at);
+
+          if (!statsMap.has(key)) {
+            statsMap.set(key, {
+              productName: prodName,
+              colorName: colorName,
+              totalDay: 0,
+              newSinceCutoff: 0
+            });
+          }
+
+          const entry = statsMap.get(key);
+          entry.totalDay += qty;
+
+          if (logTime > cutoffTime) {
+            entry.newSinceCutoff += qty;
+          }
+        } else {
+          console.warn('Could not parse log description:', log.description);
+        }
+      }
+
+      const result = Array.from(statsMap.values());
+      console.log('Report Stats Calculated:', result.length, result);
+      return result;
+
+    } catch (err) {
+      console.error('Error calculando estadísticas de reporte:', err);
+      return [];
+    }
+  }
+
+  // Helper para revertir consumo (no ideal, pero funcional con el esquema actual de logs de texto)
+  private getConsumptionPerUnit(description: string): number {
+    // Intentar buscar el producto en memoria para sacar su consumo
+    // Esto es un fallback si no podemos parsear la cantidad directa del string
+    return 1;
   }
 }
