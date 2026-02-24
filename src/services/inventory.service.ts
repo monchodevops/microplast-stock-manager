@@ -187,6 +187,60 @@ export class InventoryService {
   }
 
   /**
+   * Ajuste Manual de Producto Terminado
+   */
+  async ajustarStockProductoTerminado(finishedGoodId: string, stockActual: number, nuevaCantidad: number, motivo: string) {
+    try {
+      const diferencia = nuevaCantidad - stockActual;
+
+      if (diferencia === 0) {
+        return { success: true, message: 'No hay cambios en el stock.' };
+      }
+
+      // Fetch the finished good to get the product details for the log
+      const good = this.finishedGoods().find(g => g.id === finishedGoodId);
+      if (!good) throw new Error('Producto terminado no encontrado en el estado local.');
+
+      const productDef = this.products().find(p => p.id === good.productDefinitionId);
+      const productName = productDef?.name || 'Desconocido';
+      const colorName = good.colorName || 'Desconocido';
+
+      // 1. Update Table
+      const { error: updateError } = await supabase
+        .from('finished_goods_stock')
+        .update({
+          quantity_units: nuevaCantidad
+        })
+        .eq('id', finishedGoodId);
+
+      if (updateError) {
+        throw new Error(`Error al actualizar el stock: ${updateError.message}`);
+      }
+
+      // 2. Log Adjustment 
+      const { error: logError } = await supabase.from('production_logs').insert({
+        transaction_type: 'MANUAL_ADJUSTMENT',
+        description: `Ajuste [${productName} - ${colorName}]: ${motivo}`,
+        amount_change: diferencia
+      });
+
+      if (logError) {
+        // Critical error: Updated stock but failed to log.
+        console.error('CRITICAL ERROR: Stock updated but failed to log transaction!', logError);
+        // In a real application, we might alert a monitoring system here.
+        // For now, we throw an error so the UI can notify the user of the partial failure.
+        throw new Error('Stock actualizado, pero falló el registro de auditoría. Contacte a soporte.');
+      }
+
+      await this.loadData();
+      return { success: true, message: 'Stock ajustado correctamente.' };
+    } catch (err: any) {
+      console.error('Error ajustando stock de producto terminado:', err);
+      throw err;
+    }
+  }
+
+  /**
    * Actualización Masiva de Alertas
    */
   async updateGlobalAlertThreshold(thresholdKg: number) {

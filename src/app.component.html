@@ -14,55 +14,44 @@
     </div>
 
     <nav class="flex-1 px-2 py-6 space-y-2 overflow-y-auto">
-      <a (click)="setView('dashboard')"
-        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors"
-        [class.bg-slate-800]="currentView() === 'dashboard'" [class.text-white]="currentView() === 'dashboard'"
-        [class.text-slate-300]="currentView() !== 'dashboard'"
-        [class.hover:bg-slate-800]="currentView() !== 'dashboard'"
-        [class.hover:text-white]="currentView() !== 'dashboard'">
-        <svg class="mr-3 flex-shrink-0 h-6 w-6" [class.text-blue-500]="currentView() === 'dashboard'"
-          [class.text-slate-400]="currentView() !== 'dashboard'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <a routerLink="/dashboard" routerLinkActive="bg-slate-800 text-white active-link" [routerLinkActiveOptions]="{exact: true}"
+        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
+        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-slate-400 group-[.active-link]:text-blue-500 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
         </svg>
         Dashboard
       </a>
 
-      <a (click)="setView('production')"
-        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors"
-        [class.bg-slate-800]="currentView() === 'production'" [class.text-white]="currentView() === 'production'"
-        [class.text-slate-300]="currentView() !== 'production'"
-        [class.hover:bg-slate-800]="currentView() !== 'production'"
-        [class.hover:text-white]="currentView() !== 'production'">
-        <svg class="mr-3 flex-shrink-0 h-6 w-6" [class.text-blue-500]="currentView() === 'production'"
-          [class.text-slate-400]="currentView() !== 'production'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <a routerLink="/production" routerLinkActive="bg-slate-800 text-white active-link"
+        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
+        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-slate-400 group-[.active-link]:text-blue-500 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         Registrar Producción
       </a>
 
-      <a (click)="setView('inventory')"
-        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors"
-        [class.bg-slate-800]="currentView() === 'inventory'" [class.text-white]="currentView() === 'inventory'"
-        [class.text-slate-300]="currentView() !== 'inventory'"
-        [class.hover:bg-slate-800]="currentView() !== 'inventory'"
-        [class.hover:text-white]="currentView() !== 'inventory'">
-        <svg class="mr-3 flex-shrink-0 h-6 w-6" [class.text-blue-500]="currentView() === 'inventory'"
-          [class.text-slate-400]="currentView() !== 'inventory'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <a routerLink="/raw-materials" routerLinkActive="bg-slate-800 text-white active-link"
+        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
+        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-slate-400 group-[.active-link]:text-blue-500 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
         </svg>
-        Inventario
+        Materia Prima
       </a>
 
-      <a (click)="setView('recipes')"
-        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors"
-        [class.bg-slate-800]="currentView() === 'recipes'" [class.text-white]="currentView() === 'recipes'"
-        [class.text-slate-300]="currentView() !== 'recipes'" [class.hover:bg-slate-800]="currentView() !== 'recipes'"
-        [class.hover:text-white]="currentView() !== 'recipes'">
-        <svg class="mr-3 flex-shrink-0 h-6 w-6" [class.text-blue-500]="currentView() === 'recipes'"
-          [class.text-slate-400]="currentView() !== 'recipes'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <a routerLink="/finished-goods" routerLinkActive="bg-slate-800 text-white active-link"
+        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
+        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-slate-400 group-[.active-link]:text-blue-500 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+        </svg>
+        Productos Terminados
+      </a>
+
+      <a routerLink="/recipes" routerLinkActive="bg-slate-800 text-white active-link"
+        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
+        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-slate-400 group-[.active-link]:text-blue-500 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -70,13 +59,9 @@
         Recetas / Config
       </a>
 
-      <a (click)="setView('report')"
-        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors"
-        [class.bg-slate-800]="currentView() === 'report'" [class.text-white]="currentView() === 'report'"
-        [class.text-slate-300]="currentView() !== 'report'" [class.hover:bg-slate-800]="currentView() !== 'report'"
-        [class.hover:text-white]="currentView() !== 'report'">
-        <svg class="mr-3 flex-shrink-0 h-6 w-6" [class.text-blue-500]="currentView() === 'report'"
-          [class.text-slate-400]="currentView() !== 'report'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <a routerLink="/report" routerLinkActive="bg-slate-800 text-white active-link"
+        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
+        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-slate-400 group-[.active-link]:text-blue-500 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
@@ -98,17 +83,7 @@
   <main
     class="flex-1 overflow-y-auto focus:outline-none bg-gray-100 print:h-auto print:overflow-visible print:bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      @if (currentView() === 'dashboard') {
-      <app-dashboard />
-      } @else if (currentView() === 'production') {
-      <app-production />
-      } @else if (currentView() === 'inventory') {
-      <app-inventory-view />
-      } @else if (currentView() === 'recipes') {
-      <app-recipes />
-      } @else if (currentView() === 'report') {
-      <app-production-report />
-      }
+      <router-outlet></router-outlet>
     </div>
   </main>
 </div>
