@@ -20,6 +20,7 @@ export interface FinishedGood {
   productDefinitionId: string;
   colorName: string;
   quantityUnits: number;
+  unit_price?: number;
 }
 
 export interface ProductionLog {
@@ -93,7 +94,8 @@ export class InventoryService {
           id: d.id,
           productDefinitionId: d.product_definition_id,
           colorName: d.color_name,
-          quantityUnits: d.quantity_units
+          quantityUnits: d.quantity_units,
+          unit_price: d.unit_price ?? 0
         })));
       }
 
@@ -183,6 +185,64 @@ export class InventoryService {
     } catch (err) {
       console.error('Error actualizando materia prima:', err);
       throw err;
+    }
+  }
+
+  /**
+   * Actualización Masiva de Precios de Productos Terminados
+   */
+  async bulkUpdatePrices(updates: { id: string; new_price: number }[]): Promise<{ success: boolean; message: string; count: number }> {
+    try {
+      if (updates.length === 0) {
+        return { success: false, message: 'No hay elementos para actualizar.', count: 0 };
+      }
+
+      const results = await Promise.all(
+        updates.map(({ id, new_price }) =>
+          supabase
+            .from('finished_goods_stock')
+            .update({ unit_price: new_price })
+            .eq('id', id)
+        )
+      );
+
+      const failed = results.filter(r => r.error);
+      if (failed.length > 0) {
+        console.error('Errores parciales en actualización masiva:', failed.map(r => r.error));
+        throw new Error(`${failed.length} actualización(es) fallaron. Verifique la consola.`);
+      }
+
+      await this.loadData();
+      return { success: true, message: `Se actualizaron ${updates.length} precios exitosamente.`, count: updates.length };
+    } catch (err: any) {
+      console.error('Error en actualización masiva de precios:', err);
+      return { success: false, message: err.message || 'Error desconocido en la actualización masiva.', count: 0 };
+    }
+  }
+
+  /**
+   * Actualizar Precio de Producto Terminado
+   */
+  async actualizarPrecioProducto(finishedGoodId: string, nuevoPrecio: number): Promise<{ success: boolean; message: string }> {
+    try {
+      if (nuevoPrecio < 0) {
+        return { success: false, message: 'El precio no puede ser negativo.' };
+      }
+
+      const { error } = await supabase
+        .from('finished_goods_stock')
+        .update({ unit_price: nuevoPrecio })
+        .eq('id', finishedGoodId);
+
+      if (error) {
+        throw new Error(`Error al actualizar el precio: ${error.message}`);
+      }
+
+      await this.loadData();
+      return { success: true, message: 'Precio actualizado correctamente.' };
+    } catch (err: any) {
+      console.error('Error actualizando precio de producto terminado:', err);
+      return { success: false, message: err.message || 'Error desconocido al actualizar el precio.' };
     }
   }
 
