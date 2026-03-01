@@ -8,4 +8,11 @@ export default defineConfig({
   resolve: {
     mainFields: ['module'],
   },
+  test: {
+    globals: true,
+    environment: 'happy-dom',
+    setupFiles: ['src/test-setup.ts'],
+    include: ['src/**/*.spec.ts'],
+    reporters: ['verbose'],
+  },
 });

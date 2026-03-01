@@ -25,10 +25,25 @@ export interface FinishedGood {
 
 export interface ProductionLog {
   id: string;
-  transactionType: 'INCOMING_MATERIAL' | 'PRODUCTION_RUN' | 'MANUAL_ADJUSTMENT';
+  transactionType: 'INCOMING_MATERIAL' | 'PRODUCTION_RUN' | 'DISPATCH' | 'AJUSTE_MATERIA_PRIMA' | 'AJUSTE_PRODUCTOS' | 'PRECIO';
   description: string;
   amountChange: number;
   createdAt: Date;
+}
+
+export interface LogFilter {
+  dateFrom?: Date | null;
+  dateTo?: Date | null;
+  transactionTypes?: string[];
+}
+
+export interface PaginatedLogsResult {
+  logs: ProductionLog[];
+  totalCount: number;
+  currentPage: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 }
 
 @Injectable({
@@ -113,6 +128,77 @@ export class InventoryService {
     }
   }
 
+  /**
+   * Búsqueda avanzada de logs con filtros y paginación
+   */
+  async getFilteredLogs(filters?: LogFilter, page: number = 1, pageSize: number = 25): Promise<PaginatedLogsResult> {
+    try {
+      let query = supabase
+        .from('production_logs')
+        .select('*', { count: 'exact' });
+
+      // Apply filters
+      if (filters?.dateFrom) {
+        query = query.gte('created_at', filters.dateFrom.toISOString());
+      }
+      
+      if (filters?.dateTo) {
+        // End of day for dateTo
+        const endOfDay = new Date(filters.dateTo);
+        endOfDay.setHours(23, 59, 59, 999);
+        query = query.lte('created_at', endOfDay.toISOString());
+      }
+
+      if (filters?.transactionTypes && filters.transactionTypes.length > 0) {
+        query = query.in('transaction_type', filters.transactionTypes);
+      }
+
+      // Apply pagination and ordering
+      const offset = (page - 1) * pageSize;
+      query = query
+        .order('created_at', { ascending: false })
+        .range(offset, offset + pageSize - 1);
+
+      const { data, count, error } = await query;
+
+      if (error) {
+        throw error;
+      }
+
+      const totalCount = count || 0;
+      const totalPages = Math.ceil(totalCount / pageSize);
+
+      const logs: ProductionLog[] = data?.map((d: any) => ({
+        id: d.id,
+        transactionType: d.transaction_type,
+        description: d.description,
+        amountChange: d.amount_change,
+        createdAt: new Date(d.created_at)
+      })) || [];
+
+      return {
+        logs,
+        totalCount,
+        currentPage: page,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1
+      };
+    } catch (error) {
+      console.error('Error obteniendo logs filtrados:', error);
+      throw error;
+    }
+  }
+
+  // --- Computed and Helper Methods ---
+
+  /**
+   * Obtiene todos los colores únicos disponibles para materia prima
+   */
+  getAllAvailableColors = computed(() => {
+    return Array.from(new Set(this.rawMaterials().map(m => m.colorName))).sort();
+  });
+
   // --- Actions (Async) ---
 
   async addRawMaterialStock(colorName: string, amountKg: number) {
@@ -120,11 +206,14 @@ export class InventoryService {
     const existing = this.rawMaterials().find(m => m.colorName.toLowerCase() === colorName.toLowerCase());
 
     try {
+      const previousStock = existing ? existing.currentStockKg : 0;
+      const newStock = previousStock + amountKg;
+
       if (existing) {
         // Update
         await supabase
           .from('raw_materials')
-          .update({ current_stock_kg: existing.currentStockKg + amountKg, last_updated: new Date() })
+          .update({ current_stock_kg: newStock, last_updated: new Date() })
           .eq('id', existing.id);
       } else {
         // Insert new
@@ -140,7 +229,7 @@ export class InventoryService {
       // Log transaction
       await supabase.from('production_logs').insert({
         transaction_type: 'INCOMING_MATERIAL',
-        description: `Ingreso de materia prima: ${colorName}`,
+        description: `Ingreso de materia prima - ${colorName} || ${previousStock} kg --> ${newStock} kg`,
         amount_change: amountKg
       });
 
@@ -175,8 +264,8 @@ export class InventoryService {
       // 2. Log Adjustment if stock changed significantly (> 0.01kg)
       if (Math.abs(diff) > 0.01) {
         await supabase.from('production_logs').insert({
-          transaction_type: 'INCOMING_MATERIAL', // Usamos un tipo existente o podríamos crear 'MANUAL_ADJUSTMENT' si modificamos el enum en DB
-          description: `Ajuste manual de inventario (${oldData?.colorName})`,
+          transaction_type: 'AJUSTE_MATERIA_PRIMA',
+          description: `Ajuste manual de materia prima - ${oldData?.colorName} || ${oldData?.currentStockKg} kg --> ${newStockKg} kg`,
           amount_change: diff
         });
       }
@@ -212,6 +301,13 @@ export class InventoryService {
         throw new Error(`${failed.length} actualización(es) fallaron. Verifique la consola.`);
       }
 
+      // Log price update transaction
+      await supabase.from('production_logs').insert({
+        transaction_type: 'PRECIO',
+        description: `Actualización masiva de precios - ${updates.length} productos actualizados`,
+        amount_change: 0
+      });
+
       await this.loadData();
       return { success: true, message: `Se actualizaron ${updates.length} precios exitosamente.`, count: updates.length };
     } catch (err: any) {
@@ -237,6 +333,19 @@ export class InventoryService {
       if (error) {
         throw new Error(`Error al actualizar el precio: ${error.message}`);
       }
+
+      // Get product details for the log
+      const good = this.finishedGoods().find(g => g.id === finishedGoodId);
+      const productDef = this.products().find(p => p.id === good?.productDefinitionId);
+      const productName = productDef?.name || 'Producto';
+      const colorName = good?.colorName || 'Color desconocido';
+      
+      // Log price update transaction
+      await supabase.from('production_logs').insert({
+        transaction_type: 'PRECIO',
+        description: `Actualización de precio - ${productName} (${colorName}) a $${nuevoPrecio}`,
+        amount_change: 0
+      });
 
       await this.loadData();
       return { success: true, message: 'Precio actualizado correctamente.' };
@@ -279,8 +388,8 @@ export class InventoryService {
 
       // 2. Log Adjustment 
       const { error: logError } = await supabase.from('production_logs').insert({
-        transaction_type: 'MANUAL_ADJUSTMENT',
-        description: `Ajuste [${productName} - ${colorName}]: ${motivo}`,
+        transaction_type: 'AJUSTE_PRODUCTOS',
+        description: `Ajuste [${productName} - ${colorName}]: ${motivo} || ${stockActual} u. --> ${nuevaCantidad} u.`,
         amount_change: diferencia
       });
 

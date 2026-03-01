@@ -7,6 +7,7 @@ export interface ColumnDef {
     sortable?: boolean;
     align?: 'left' | 'center' | 'right';
     sortValue?: (item: any) => any;
+    width?: string; // Added width support
 }
 
 @Component({
@@ -15,13 +16,14 @@ export interface ColumnDef {
     imports: [CommonModule],
     template: `
     <div class="bg-white shadow overflow-hidden border border-gray-200 rounded-lg">
-      <table class="min-w-full divide-y divide-gray-200">
+      <table class="min-w-full divide-y divide-gray-200 table-fixed">
         <thead class="bg-gray-50">
           <tr>
             @for (col of columns; track col.key) {
                <th (click)="col.sortable ? handleSort(col.key) : null" 
                    [class.cursor-pointer]="col.sortable"
                    [class.hover:bg-gray-100]="col.sortable"
+                   [class]="col.width || ''"
                    class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider transition-colors group select-none">
                   <div class="flex items-center space-x-1"
                        [ngClass]="{'justify-start': col.align === 'left' || !col.align, 'justify-end': col.align === 'right', 'justify-center': col.align === 'center'}">
@@ -42,7 +44,8 @@ export interface ColumnDef {
             @for (item of sortedData; track item.id || $index) {
                 <tr class="hover:bg-gray-50 transition-colors">
                     @for (col of columns; track col.key) {
-                        <td class="px-6 py-4 whitespace-nowrap text-sm"
+                        <td class="px-6 py-4 text-sm"
+                            [class]="col.width || ''"
                             [ngClass]="{'text-left': col.align === 'left' || !col.align, 'text-right': col.align === 'right', 'text-center': col.align === 'center'}">
                             <ng-container *ngTemplateOutlet="cellTemplate || defaultCell; context: { $implicit: item, col: col }"></ng-container>
                         </td>

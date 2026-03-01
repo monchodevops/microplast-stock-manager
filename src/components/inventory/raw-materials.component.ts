@@ -28,11 +28,50 @@ import { DataGridComponent, ColumnDef } from '../shared/data-grid.component';
           <div class="bg-gray-50 p-4 mb-4 rounded border border-gray-200 animate-fade-in shadow-inner">
             <h3 class="font-medium text-gray-900 mb-3">Ingresar Nueva Materia Prima</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <input type="text" [(ngModel)]="newMaterialColor" placeholder="Color (ej. Azul)" class="p-2 border border-gray-600 rounded bg-white text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-              <input type="number" [(ngModel)]="newMaterialAmount" placeholder="Cantidad (kg)" class="p-2 border border-gray-600 rounded bg-white text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-              <button (click)="addMaterial()" [disabled]="isAdding" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 shadow-sm disabled:opacity-50 font-medium cursor-pointer">
-                {{ isAdding ? 'Guardando...' : 'Confirmar Ingreso' }}
-              </button>
+              <!-- Color Selection -->
+              <div class="flex space-x-2">
+                @if (!isNewColorMode) {
+                  <select [(ngModel)]="newMaterialColor" class="flex-1 p-2 border border-gray-600 rounded bg-white text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="" disabled>Seleccionar color</option>
+                    @for (color of availableColors(); track color) {
+                      <option [value]="color">{{ color }}</option>
+                    }
+                  </select>
+                  <button 
+                    (click)="toggleNewColorMode()"
+                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm font-medium shadow-sm transition-colors cursor-pointer flex items-center justify-center"
+                    title="Agregar nuevo color">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                  </button>
+                } @else {
+                  <input 
+                    type="text" 
+                    [(ngModel)]="newMaterialColor" 
+                    (input)="onColorInput($event)"
+                    placeholder="Nombre del nuevo color" 
+                    class="flex-1 p-2 border border-gray-600 rounded bg-white text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                  <button 
+                    (click)="toggleNewColorMode()"
+                    class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm font-medium shadow-sm transition-colors cursor-pointer"
+                    title="Cancelar nuevo color">
+                    ✕
+                  </button>
+                }
+              </div>
+
+              @if (availableColors().length === 0 && !isNewColorMode) {
+                <div class="col-span-2 text-sm text-gray-500 bg-gray-100 rounded p-2 border border-gray-300">
+                  No hay colores registrados. Presione "Nuevo" para crear el primero.
+                </div>
+              } @else {
+                <input type="number" [(ngModel)]="newMaterialAmount" placeholder="Cantidad (kg)" class="p-2 border border-gray-600 rounded bg-white text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+
+                <button (click)="addMaterial()" [disabled]="isAdding || !isFormValid()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 shadow-sm disabled:opacity-50 font-medium cursor-pointer">
+                  {{ isAdding ? 'Guardando...' : 'Confirmar Ingreso' }}
+                </button>
+              }
             </div>
           </div>
         }
@@ -144,6 +183,10 @@ export class RawMaterialsComponent {
     newMaterialColor = '';
     newMaterialAmount = 0;
     isAdding = false;
+    isNewColorMode = false;
+
+    // Computed for available colors
+    availableColors = this.inventory.getAllAvailableColors;
 
     // Global Config
     showGlobalConfigModal = false;
@@ -158,15 +201,47 @@ export class RawMaterialsComponent {
     editFormThreshold = 0;
     isSavingEdit = false;
 
-    async addMaterial() {
-        if (this.newMaterialColor && this.newMaterialAmount > 0) {
-            this.isAdding = true;
-            await this.inventory.addRawMaterialStock(this.newMaterialColor, this.newMaterialAmount);
-            this.newMaterialColor = '';
-            this.newMaterialAmount = 0;
-            this.showAddMaterial = false;
-            this.isAdding = false;
+    toggleNewColorMode() {
+        this.isNewColorMode = !this.isNewColorMode;
+        this.newMaterialColor = ''; // Reset color selection when toggling
+    }
+
+    onColorInput(event: any) {
+        // Only allow alphanumeric characters and spaces
+        const value = event.target.value;
+        const sanitized = value.replace(/[^a-zA-Z0-9\s]/g, '');
+        if (value !== sanitized) {
+            event.target.value = sanitized;
+            this.newMaterialColor = sanitized;
         }
+    }
+
+    isFormValid(): boolean {
+        const hasValidColor = this.newMaterialColor.trim() !== '';
+        const hasValidAmount = this.newMaterialAmount > 0;
+        return hasValidColor && hasValidAmount;
+    }
+
+    async addMaterial() {
+        if (this.isFormValid()) {
+            this.isAdding = true;
+            try {
+                await this.inventory.addRawMaterialStock(this.newMaterialColor.trim(), this.newMaterialAmount);
+                this.resetForm();
+            } catch (error) {
+                console.error('Error agregando material:', error);
+                alert('Error al agregar material. Verifique la consola para más detalles.');
+            } finally {
+                this.isAdding = false;
+            }
+        }
+    }
+
+    private resetForm() {
+        this.newMaterialColor = '';
+        this.newMaterialAmount = 0;
+        this.isNewColorMode = false;
+        this.showAddMaterial = false;
     }
 
     openGlobalConfig() {

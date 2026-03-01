@@ -10,6 +10,9 @@ export const routes: Routes = [
     { path: 'production', component: ProductionComponent },
     { path: 'raw-materials', loadComponent: () => import('./components/inventory/raw-materials.component').then(c => c.RawMaterialsComponent) },
     { path: 'finished-goods', loadComponent: () => import('./components/inventory/finished-goods.component').then(c => c.FinishedGoodsComponent) },
+    { path: 'dispatch', loadComponent: () => import('./components/dispatch/dispatch-builder.component').then(c => c.DispatchBuilderComponent) },
+    { path: 'historial-remitos', loadComponent: () => import('./components/dispatch/dispatch-history.component').then(c => c.DispatchHistoryComponent) },
+    { path: 'remito/imprimir/:id', loadComponent: () => import('./components/dispatch/remito-print.component').then(c => c.RemitoPrintComponent) },
     { path: 'recipes', component: RecipesComponent },
     { path: 'report', component: ProductionReportComponent }
 ];
