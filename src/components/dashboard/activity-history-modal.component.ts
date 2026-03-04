@@ -273,11 +273,11 @@ export class ActivityHistoryModalComponent implements OnChanges {
       const filters: LogFilter = {};
       
       if (this.startDateStr) {
-        filters.dateFrom = new Date(this.startDateStr);
+        filters.dateFrom = new Date(this.startDateStr + 'T00:00:00');
       }
       
       if (this.endDateStr) {
-        filters.dateTo = new Date(this.endDateStr);
+        filters.dateTo = new Date(this.endDateStr + 'T00:00:00');
       }
       
       if (this.selectedTypes.length > 0) {

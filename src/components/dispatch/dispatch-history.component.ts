@@ -317,11 +317,11 @@ export class DispatchHistoryComponent implements OnInit {
   }
 
   /**
-   * Parse date string from input to Date object
+   * Parse date string from input to Date object (local time, not UTC)
    */
   private parseDateFromInput(dateStr: string): Date | undefined {
     if (!dateStr) return undefined;
-    return new Date(dateStr + 'T00:00:00.000Z');
+    return new Date(dateStr + 'T00:00:00');
   }
 
   /**

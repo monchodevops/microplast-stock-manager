@@ -86,7 +86,7 @@ import { DataGridComponent, ColumnDef } from '../shared/data-grid.component';
                 <span class="text-gray-500">{{ item.alertThresholdKg | number:'1.0-0' }} kg</span>
               }
               @case ('status') {
-                @if (item.currentStockKg <= item.alertThresholdKg) {
+                @if (item.currentStockKg <= item.alertThresholdKg && item.alertThresholdKg > 0) {
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 shadow-sm">
                     ⚠️ Bajo Stock
                   </span>
@@ -174,7 +174,7 @@ export class RawMaterialsComponent {
         { key: 'colorName', label: 'Color', sortable: true, align: 'left' },
         { key: 'currentStockKg', label: 'Stock Actual', sortable: true, align: 'right' },
         { key: 'alertThresholdKg', label: 'Alerta (Mín)', sortable: true, align: 'right' },
-        { key: 'status', label: 'Estado', sortable: true, align: 'center', sortValue: (item: RawMaterial) => item.currentStockKg <= item.alertThresholdKg ? 1 : 2 },
+        { key: 'status', label: 'Estado', sortable: true, align: 'center', sortValue: (item: RawMaterial) => (item.currentStockKg <= item.alertThresholdKg && item.alertThresholdKg > 0) ? 1 : 2 },
         { key: 'actions', label: 'Acciones', align: 'center' }
     ];
 

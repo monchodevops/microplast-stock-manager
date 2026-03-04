@@ -9,6 +9,19 @@ import { InventoryService, ProductDefinition } from '../../services/inventory.se
   imports: [CommonModule, FormsModule],
   template: `
     <div class="space-y-6 relative">
+      <!-- Success Message -->
+      @if (showSuccessMessage()) {
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative animate-fade-in">
+          <span class="block sm:inline">{{ successMessage() }}</span>
+          <button (click)="showSuccessMessage.set(false)" class="absolute top-0 bottom-0 right-0 px-4 py-3">
+            <svg class="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+              <title>Close</title>
+              <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+            </svg>
+          </button>
+        </div>
+      }
+      
       <div class="flex justify-between items-center">
         <h2 class="text-2xl font-bold text-gray-800">Recetas (Definiciones de Producto)</h2>
         <button (click)="isEditing = true; clearForm()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm transition-colors">
@@ -109,6 +122,10 @@ export class RecipesComponent {
   formName = '';
   formCategory = '';
   formConsumption = 0;
+  
+  // Success message
+  showSuccessMessage = signal(false);
+  successMessage = signal('');
 
   // Delete State
   showDeleteConfirm = false;
@@ -135,13 +152,30 @@ export class RecipesComponent {
     if (!this.formName || this.formConsumption <= 0) return;
 
     this.isSaving = true;
+    const isNewProduct = !this.editingId;
+    const productId = this.editingId || crypto.randomUUID();
+    
     try {
+      // Guardar la receta
       await this.inventory.updateProductDefinition({
-        id: this.editingId || crypto.randomUUID(),
+        id: productId,
         name: this.formName,
         category: this.formCategory,
         consumptionPerUnitKg: this.formConsumption
       });
+
+      // Si es un producto nuevo, crear automáticamente productos terminados
+      if (isNewProduct) {
+        const result = await this.inventory.createFinishedGoodsForNewRecipe(productId);
+        this.successMessage.set(result.message);
+        this.showSuccessMessage.set(true);
+        
+        // Auto-ocultar mensaje después de 5 segundos
+        setTimeout(() => {
+          this.showSuccessMessage.set(false);
+        }, 5000);
+      }
+      
       this.isEditing = false;
     } finally {
       this.isSaving = false;

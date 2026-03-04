@@ -82,7 +82,13 @@ export class InventoryService {
         supabase.from('raw_materials').select('*').order('color_name'),
         // FILTRO AGREGADO: .is('deleted_at', null) para traer solo productos activos
         supabase.from('product_definitions').select('*').is('deleted_at', null).order('name'),
-        supabase.from('finished_goods_stock').select('*'),
+        // FILTRO AGREGADO: Solo productos terminados de recetas activas (no eliminadas)
+        supabase.from('finished_goods_stock')
+          .select(`
+            *,
+            product_definitions!inner(deleted_at)
+          `)
+          .is('product_definitions.deleted_at', null),
         supabase.from('production_logs').select('*').order('created_at', { ascending: false }).limit(50)
       ]);
 
@@ -139,11 +145,14 @@ export class InventoryService {
 
       // Apply filters
       if (filters?.dateFrom) {
-        query = query.gte('created_at', filters.dateFrom.toISOString());
+        // Start of day in local time
+        const startOfDay = new Date(filters.dateFrom);
+        startOfDay.setHours(0, 0, 0, 0);
+        query = query.gte('created_at', startOfDay.toISOString());
       }
       
       if (filters?.dateTo) {
-        // End of day for dateTo
+        // End of day in local time
         const endOfDay = new Date(filters.dateTo);
         endOfDay.setHours(23, 59, 59, 999);
         query = query.lte('created_at', endOfDay.toISOString());
@@ -451,19 +460,117 @@ export class InventoryService {
     }
   }
 
+  /**
+   * Crea automáticamente productos terminados para una nueva receta
+   * en todos los colores disponibles con stock inicial en 0
+   */
+  async createFinishedGoodsForNewRecipe(productDefinitionId: string): Promise<{ success: boolean, message: string, createdCount?: number }> {
+    try {
+      // Obtener todos los colores disponibles en materias primas
+      const { data: rawMaterials, error: rmError } = await supabase
+        .from('raw_materials')
+        .select('color_name')
+        .order('color_name');
+
+      if (rmError) throw rmError;
+      if (!rawMaterials || rawMaterials.length === 0) {
+        return { success: false, message: 'No se encontraron colores disponibles en materias primas.' };
+      }
+
+      // Crear productos terminados para cada color
+      const finishedGoodsToCreate = rawMaterials.map(rm => ({
+        product_definition_id: productDefinitionId,
+        color_name: rm.color_name,
+        quantity_units: 0,
+        unit_price: 0
+      }));
+
+      const { data, error } = await supabase
+        .from('finished_goods_stock')
+        .insert(finishedGoodsToCreate)
+        .select();
+
+      if (error) {
+        // Si hay error por duplicados, intentar uno por uno
+        if (error.code === '23505') { // Unique constraint violation
+          let createdCount = 0;
+          for (const finishedGood of finishedGoodsToCreate) {
+            try {
+              await supabase
+                .from('finished_goods_stock')
+                .insert(finishedGood);
+              createdCount++;
+            } catch (duplicateError) {
+              // Ignorar duplicados, continuar con el siguiente
+              continue;
+            }
+          }
+          
+          await this.loadData();
+          return { 
+            success: true, 
+            message: `Receta guardada. Se crearon ${createdCount} productos terminados (algunos colores ya existían).`,
+            createdCount
+          };
+        } else {
+          throw error;
+        }
+      }
+
+      await this.loadData();
+      const createdCount = data ? data.length : 0;
+      return { 
+        success: true, 
+        message: `Receta guardada. Se crearon ${createdCount} productos terminados automáticamente.`,
+        createdCount
+      };
+
+    } catch (err) {
+      console.error('Error creando productos terminados para nueva receta:', err);
+      return { 
+        success: false, 
+        message: 'Error al crear productos terminados automáticamente. Receta guardada, pero deberás crear los productos manualmente.'
+      };
+    }
+  }
+
   async deleteProduct(id: string) {
     try {
-      // BORRADO LÓGICO: Actualizamos el campo deleted_at en lugar de borrar la fila
-      const { error } = await supabase
+      // 1. Verificar si hay productos terminados asociados que han sido despachados
+      const { data: dispatchedItems, error: dispatchCheckError } = await supabase
+        .from('dispatch_order_items')
+        .select('finished_good_id, finished_goods_stock!inner(product_definition_id)')
+        .eq('finished_goods_stock.product_definition_id', id)
+        .limit(1);
+
+      if (dispatchCheckError) throw dispatchCheckError;
+
+      if (dispatchedItems && dispatchedItems.length > 0) {
+        alert('No se puede eliminar esta receta porque tiene productos terminados que ya han sido despachados. El historial de despachos debe mantenerse.');
+        return;
+      }
+
+      // 2. BORRADO LÓGICO: Actualizamos el campo deleted_at en lugar de borrar la fila
+      const { error: productError } = await supabase
         .from('product_definitions')
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', id);
 
-      if (error) throw error;
+      if (productError) throw productError;
+
+      // 3. ELIMINAR productos terminados asociados (solo si no han sido despachados)
+      // Cuando se elimina una receta, también eliminamos todos los productos terminados
+      // creados para esa receta en todos los colores
+      const { error: finishedGoodsError } = await supabase
+        .from('finished_goods_stock')
+        .delete()
+        .eq('product_definition_id', id);
+
+      if (finishedGoodsError) throw finishedGoodsError;
 
       await this.loadData();
     } catch (err) {
-      console.error('Error borrando producto (lógico):', err);
+      console.error('Error borrando producto (lógico) y productos terminados asociados:', err);
       alert('Error al borrar el producto. Verifica la consola para más detalles.');
     }
   }

@@ -205,14 +205,16 @@ export class DispatchService {
 
     // Apply date range filters
     if (filters?.startDate) {
-      query = query.gte('created_at', filters.startDate.toISOString());
+      // Start of day for startDate
+      const startOfDay = new Date(filters.startDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      query = query.gte('created_at', startOfDay.toISOString());
     }
     if (filters?.endDate) {
-      // Add one day and set to start of day to include the full end date
+      // End of day for endDate
       const endOfDay = new Date(filters.endDate);
-      endOfDay.setDate(endOfDay.getDate() + 1);
-      endOfDay.setHours(0, 0, 0, 0);
-      query = query.lt('created_at', endOfDay.toISOString());
+      endOfDay.setHours(23, 59, 59, 999);
+      query = query.lte('created_at', endOfDay.toISOString());
     }
 
     // Apply text search filter
