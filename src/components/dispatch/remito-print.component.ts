@@ -76,7 +76,7 @@ import { DispatchService, FullDispatchOrder } from '../../services/dispatch.serv
                 <p class="text-slate-300 text-sm mt-1 font-mono">{{ order()!.header.orderNumber }}</p>
               </div>
               <div class="text-right text-sm text-slate-300">
-                <p class="font-semibold text-white text-base">ROTOSYS</p>
+                <p class="font-semibold text-white text-base">Microplast</p>
                 <p>Planta Principal</p>
                 <p class="mt-1">{{ order()!.header.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
               </div>
