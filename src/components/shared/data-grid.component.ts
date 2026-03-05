@@ -15,24 +15,23 @@ export interface ColumnDef {
     standalone: true,
     imports: [CommonModule],
     template: `
-    <div class="bg-white shadow overflow-hidden border border-gray-200 rounded-lg">
-      <table class="min-w-full divide-y divide-gray-200 table-fixed">
-        <thead class="bg-gray-50">
-          <tr>
+    <div class="overflow-hidden rounded-xl border border-slate-200/60 bg-white">
+      <table class="min-w-full divide-y divide-slate-100 table-fixed">
+        <thead>
+          <tr class="bg-slate-50/60">
             @for (col of columns; track col.key) {
-               <th (click)="col.sortable ? handleSort(col.key) : null" 
+               <th (click)="col.sortable ? handleSort(col.key) : null"
                    [class.cursor-pointer]="col.sortable"
-                   [class.hover:bg-gray-100]="col.sortable"
                    [class]="col.width || ''"
-                   class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider transition-colors group select-none">
-                  <div class="flex items-center space-x-1"
+                   class="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400 transition-colors select-none group">
+                  <div class="flex items-center gap-1"
                        [ngClass]="{'justify-start': col.align === 'left' || !col.align, 'justify-end': col.align === 'right', 'justify-center': col.align === 'center'}">
                     <span>{{ col.label }}</span>
                     @if (col.sortable) {
                       @if (sortColumn === col.key) {
-                        <span>{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                        <span class="text-blue-500">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
                       } @else {
-                        <span class="opacity-0 group-hover:opacity-50 text-gray-400">↕</span>
+                        <span class="opacity-0 group-hover:opacity-40">↕</span>
                       }
                     }
                   </div>
@@ -40,11 +39,11 @@ export interface ColumnDef {
             }
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
+        <tbody class="divide-y divide-slate-100 bg-white">
             @for (item of sortedData; track item.id || $index) {
-                <tr class="hover:bg-gray-50 transition-colors">
+                <tr class="hover:bg-slate-50/50 transition-colors">
                     @for (col of columns; track col.key) {
-                        <td class="px-6 py-4 text-sm"
+                        <td class="px-4 py-3.5 text-sm"
                             [class]="col.width || ''"
                             [ngClass]="{'text-left': col.align === 'left' || !col.align, 'text-right': col.align === 'right', 'text-center': col.align === 'center'}">
                             <ng-container *ngTemplateOutlet="cellTemplate || defaultCell; context: { $implicit: item, col: col }"></ng-container>
@@ -54,7 +53,7 @@ export interface ColumnDef {
             }
             @if (sortedData.length === 0) {
               <tr>
-                <td [attr.colspan]="columns.length" class="px-6 py-4 text-center text-gray-500 text-sm italic">
+                <td [attr.colspan]="columns.length" class="px-4 py-8 text-center text-sm italic text-slate-400">
                   No hay datos disponibles.
                 </td>
               </tr>
@@ -64,7 +63,7 @@ export interface ColumnDef {
     </div>
 
     <ng-template #defaultCell let-item let-col="col">
-        <span class="text-gray-900 font-medium">{{ item[col.key] }}</span>
+        <span class="font-medium text-slate-800">{{ item[col.key] }}</span>
     </ng-template>
   `
 })

@@ -22,38 +22,28 @@ interface FinishedGoodDisplay {
     <div class="space-y-4">
 
       <!-- ── PAGE HEADER ─────────────────────────────────────────────── -->
-      <div class="flex items-center justify-between">
+      <div class="flex items-start justify-between">
         <div>
-          <h2 class="text-2xl font-bold text-gray-800">Generar Remito</h2>
-          <p class="text-sm text-gray-500 mt-1">
-            Construí el pedido seleccionando productos del panel derecho.
-            Solo se muestran artículos con stock disponible.
-          </p>
+          <p class="mb-0.5 text-[11px] font-semibold uppercase tracking-widest text-slate-400">Despacho</p>
+          <h1 class="text-xl font-semibold text-slate-900">Generar Remito</h1>
+          <p class="mt-0.5 text-xs text-slate-400">Construí el pedido seleccionando productos del panel derecho.</p>
         </div>
-        <div class="flex items-center gap-3">
-          <!-- Print last remito button – only shown after a successful submission -->
+        <div class="flex items-center gap-2">
           @if (lastGeneratedOrderId()) {
-            <button
-              (click)="printLastOrder()"
-              class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white
-                     bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2
-                     focus:ring-indigo-500 shadow-sm transition-all">
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            <button (click)="printLastOrder()"
+              class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
               </svg>
               Imprimir Último Remito
             </button>
           }
-
-          <!-- Cart item count badge -->
           @if (cartItems().length > 0) {
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            <span class="inline-flex items-center gap-1.5 rounded-full border border-blue-200/60 bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700">
+              <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-              {{ cartItems().length }} {{ cartItems().length === 1 ? 'artículo' : 'artículos' }} en el carrito
+              {{ cartItems().length }} {{ cartItems().length === 1 ? 'artículo' : 'artículos' }}
             </span>
           }
         </div>
@@ -68,110 +58,89 @@ interface FinishedGoodDisplay {
         <div class="w-1/2 flex flex-col gap-4">
 
           <!-- Order Header Form -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-            <h3 class="text-base font-semibold text-gray-700 mb-4 flex items-center gap-2">
-              <svg class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <div class="rounded-xl border border-slate-200/60 bg-white p-5">
+            <div class="mb-4 flex items-center gap-2">
+              <svg class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              Datos del Remito
-            </h3>
+              <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Datos del Remito</p>
+            </div>
             <div class="space-y-3">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="mb-1 block text-xs font-medium text-slate-600">
                   Cliente / Motivo <span class="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  placeholder="Ej: Distribuidora Norte, Entrega interna..."
-                  [ngModel]="clientReason()"
-                  (ngModelChange)="clientReason.set($event)"
-                  class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
-                />
+                <input type="text" placeholder="Ej: Distribuidora Norte, Entrega interna…"
+                  [ngModel]="clientReason()" (ngModelChange)="clientReason.set($event)"
+                  class="block w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors" />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="mb-1 block text-xs font-medium text-slate-600">
                   Encargado de Entrega <span class="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  placeholder="Ej: Juan Pérez, Camión propio..."
-                  [ngModel]="deliveryPerson()"
-                  (ngModelChange)="deliveryPerson.set($event)"
-                  class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
-                />
+                <input type="text" placeholder="Ej: Juan Pérez, Camión propio…"
+                  [ngModel]="deliveryPerson()" (ngModelChange)="deliveryPerson.set($event)"
+                  class="block w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors" />
               </div>
             </div>
           </div>
 
           <!-- Cart Table -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <div class="px-5 py-3 border-b border-gray-100 bg-gray-50">
-              <h3 class="text-base font-semibold text-gray-700 flex items-center gap-2">
-                <svg class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-                Carrito del Pedido
-              </h3>
+          <div class="overflow-hidden rounded-xl border border-slate-200/60 bg-white">
+            <div class="flex items-center gap-2 border-b border-slate-100 bg-slate-50/60 px-5 py-3">
+              <svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Carrito del Pedido</p>
             </div>
 
             @if (cartItems().length === 0) {
-              <!-- Empty state -->
-              <div class="flex flex-col items-center justify-center py-14 text-gray-400">
-                <svg class="h-12 w-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              <div class="flex flex-col items-center justify-center py-14 text-slate-400">
+                <svg class="mb-3 h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.25">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 <p class="text-sm font-medium">El carrito está vacío</p>
-                <p class="text-xs mt-1">Agregá productos desde el panel derecho</p>
+                <p class="mt-1 text-xs">Agregá productos desde el panel derecho</p>
               </div>
             } @else {
               <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50">
+                <table class="min-w-full divide-y divide-slate-100">
+                  <thead class="bg-slate-50/60">
                     <tr>
-                      <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Producto</th>
-                      <th class="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Cant.</th>
-                      <th class="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-28">P.Unit.</th>
-                      <th class="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-28">Subtotal</th>
-                      <th class="px-4 py-2.5 w-10"></th>
+                      <th class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400">Producto</th>
+                      <th class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-400 w-24">Cant.</th>
+                      <th class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-400 w-28">P.Unit.</th>
+                      <th class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-400 w-28">Subtotal</th>
+                      <th class="px-4 py-3 w-10"></th>
                     </tr>
                   </thead>
-                  <tbody class="bg-white divide-y divide-gray-100">
+                  <tbody class="divide-y divide-slate-100 bg-white">
                     @for (item of cartItems(); track item.finishedGoodId) {
-                      <tr class="hover:bg-gray-50 group">
-                        <td class="px-4 py-2.5">
-                          <p class="text-sm font-medium text-gray-900 leading-tight">{{ item.productName }}</p>
-                          <p class="text-xs text-gray-500">{{ item.colorName }}</p>
+                      <tr class="group hover:bg-slate-50/50">
+                        <td class="px-4 py-3">
+                          <p class="text-sm font-medium text-slate-900 leading-tight">{{ item.productName }}</p>
+                          <p class="text-xs text-slate-400">{{ item.colorName }}</p>
                         </td>
-                        <td class="px-4 py-2.5 text-right">
-                          <div class="flex items-center justify-end gap-1.5">
-                            <button
-                              (click)="decrementQty(item.finishedGoodId)"
-                              [disabled]="item.quantity <= 1"
-                              class="w-5 h-5 flex items-center justify-center rounded border border-gray-300 text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed text-xs leading-none">−</button>
-                            <span class="w-8 text-center text-sm font-medium text-gray-900">{{ item.quantity }}</span>
-                            <button
-                              (click)="incrementQty(item.finishedGoodId)"
-                              [disabled]="item.quantity >= item.availableStock"
-                              class="w-5 h-5 flex items-center justify-center rounded border border-gray-300 text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed text-xs leading-none">+</button>
+                        <td class="px-4 py-3 text-right">
+                          <div class="flex items-center justify-end gap-1">
+                            <button (click)="decrementQty(item.finishedGoodId)" [disabled]="item.quantity <= 1"
+                              class="flex h-5 w-5 items-center justify-center rounded border border-slate-200 text-xs text-slate-500 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-30 transition-colors">−</button>
+                            <span class="w-8 text-center text-sm font-medium text-slate-900 tabular-nums">{{ item.quantity }}</span>
+                            <button (click)="incrementQty(item.finishedGoodId)" [disabled]="item.quantity >= item.availableStock"
+                              class="flex h-5 w-5 items-center justify-center rounded border border-slate-200 text-xs text-slate-500 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-30 transition-colors">+</button>
                           </div>
                         </td>
-                        <td class="px-4 py-2.5 text-right text-sm text-gray-600">
+                        <td class="px-4 py-3 text-right text-sm tabular-nums text-slate-500">
                           {{ item.unit_price | currency:'ARS':'symbol':'1.2-2' }}
                         </td>
-                        <td class="px-4 py-2.5 text-right text-sm font-semibold text-gray-800">
+                        <td class="px-4 py-3 text-right text-sm font-semibold tabular-nums text-slate-800">
                           {{ (item.quantity * item.unit_price) | currency:'ARS':'symbol':'1.2-2' }}
                         </td>
-                        <td class="px-4 py-2.5 text-center">
-                          <button
-                            (click)="removeFromCart(item.finishedGoodId)"
-                            title="Quitar del carrito"
-                            class="text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
-                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        <td class="px-4 py-3 text-center">
+                          <button (click)="removeFromCart(item.finishedGoodId)" title="Quitar del carrito"
+                            class="text-slate-300 opacity-0 transition-all hover:text-red-500 group-hover:opacity-100">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                           </button>
                         </td>
@@ -181,16 +150,14 @@ interface FinishedGoodDisplay {
                 </table>
               </div>
 
-              <!-- Cart Summary Footer -->
-              <div class="px-5 py-3 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
-                <button
-                  (click)="clearCart()"
-                  class="text-xs text-gray-400 hover:text-red-500 transition-colors">
+              <!-- Cart Footer -->
+              <div class="flex items-center justify-between border-t border-slate-100 bg-slate-50/60 px-5 py-3">
+                <button (click)="clearCart()" class="text-xs text-slate-400 hover:text-red-500 transition-colors">
                   Limpiar carrito
                 </button>
                 <div class="text-right">
-                  <p class="text-xs text-gray-500 uppercase font-medium tracking-wide">Total del Pedido</p>
-                  <p class="text-2xl font-bold text-gray-900 tabular-nums">
+                  <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Total del Pedido</p>
+                  <p class="text-2xl font-bold tracking-tight text-slate-900 tabular-nums">
                     {{ totalAmount() | currency:'ARS':'symbol':'1.2-2' }}
                   </p>
                 </div>
@@ -200,55 +167,42 @@ interface FinishedGoodDisplay {
 
           <!-- Submit Button -->
           <div>
-            <button
-              (click)="confirm()"
-              [disabled]="!isFormValid() || isLoading()"
-              class="w-full py-3 px-6 rounded-lg text-sm font-semibold text-white shadow-sm transition-all
-                     bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500
-                     disabled:bg-gray-300 disabled:cursor-not-allowed disabled:shadow-none">
+            <button (click)="confirm()" [disabled]="!isFormValid() || isLoading()"
+              class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 py-3 px-6 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400">
               @if (isLoading()) {
-                <span class="flex items-center justify-center gap-2">
-                  <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                  </svg>
-                  Procesando...
-                </span>
+                <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                Procesando…
               } @else {
-                <span class="flex items-center justify-center gap-2">
-                  <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Confirmar y Generar Remito
-                </span>
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Confirmar y Generar Remito
               }
             </button>
             @if (!isFormValid() && cartItems().length > 0) {
-              <p class="text-xs text-amber-600 mt-1.5 text-center">
-                Completá los datos del remito (Cliente y Encargado) para continuar.
+              <p class="mt-1.5 text-center text-xs text-amber-600">
+                Completá los datos del remito para continuar.
               </p>
             }
           </div>
 
           <!-- Feedback Message -->
           @if (feedbackMessage()) {
-            <div
-              class="rounded-lg p-4 text-sm font-medium border"
-              [class.bg-green-50]="lastSuccess()"
-              [class.text-green-800]="lastSuccess()"
-              [class.border-green-200]="lastSuccess()"
+            <div class="rounded-xl border p-4 text-sm font-medium"
+              [class.border-emerald-200]="lastSuccess()"
+              [class.bg-emerald-50]="lastSuccess()"
+              [class.text-emerald-800]="lastSuccess()"
+              [class.border-red-200]="!lastSuccess()"
               [class.bg-red-50]="!lastSuccess()"
-              [class.text-red-800]="!lastSuccess()"
-              [class.border-red-200]="!lastSuccess()">
+              [class.text-red-800]="!lastSuccess()">
               <div class="flex items-start gap-2">
                 @if (lastSuccess()) {
-                  <svg class="h-5 w-5 flex-shrink-0 text-green-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg class="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 } @else {
-                  <svg class="h-5 w-5 flex-shrink-0 text-red-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg class="mt-0.5 h-4 w-4 flex-shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 }
                 <span>{{ feedbackMessage() }}</span>
@@ -262,90 +216,69 @@ interface FinishedGoodDisplay {
              RIGHT PANEL: PRODUCT SELECTOR
         ════════════════════════════════════════════════════════════════ -->
         <div class="w-1/2 flex flex-col gap-3 sticky top-4">
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col max-h-[calc(100vh-8rem)] overflow-hidden">
+          <div class="flex flex-col max-h-[calc(100vh-8rem)] overflow-hidden rounded-xl border border-slate-200/60 bg-white">
 
             <!-- Panel Header + Search -->
-            <div class="px-5 py-4 border-b border-gray-100 bg-gray-50 space-y-3">
-              <h3 class="text-base font-semibold text-gray-700 flex items-center gap-2">
-                <svg class="h-5 w-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+            <div class="space-y-3 border-b border-slate-100 bg-slate-50/60 px-5 py-4">
+              <div class="flex items-center gap-2">
+                <svg class="h-4 w-4 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                 </svg>
-                Seleccionar Productos
-                <span class="ml-auto text-xs font-normal text-gray-400">
-                  {{ filteredGoods().length }} con stock disponible
-                </span>
-              </h3>
-              <!-- Search -->
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Seleccionar Productos</p>
+                <span class="ml-auto text-xs text-slate-400">{{ filteredGoods().length }} con stock</span>
+              </div>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 20 20">
+                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" fill="currentColor"/>
                   </svg>
                 </span>
-                <input
-                  type="text"
-                  placeholder="Buscar por producto o color..."
-                  [ngModel]="searchTerm()"
-                  (ngModelChange)="searchTerm.set($event)"
-                  class="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md bg-white text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 transition"
-                />
+                <input type="text" placeholder="Buscar por producto o color…"
+                  [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
+                  class="block w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 placeholder-slate-400 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-colors" />
               </div>
             </div>
 
             <!-- Product List (scrollable) -->
-            <div class="overflow-y-auto flex-1">
+            <div class="flex-1 overflow-y-auto">
               @if (filteredGoods().length === 0) {
-                <div class="flex flex-col items-center justify-center py-14 text-gray-400">
-                  <svg class="h-10 w-10 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                      d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <div class="flex flex-col items-center justify-center py-14 text-slate-400">
+                  <svg class="mb-2 h-9 w-9" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.25">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <p class="text-sm">No hay productos con stock disponible</p>
                   @if (searchTerm()) {
-                    <p class="text-xs mt-1">Intentá con otro término de búsqueda</p>
+                    <p class="mt-1 text-xs">Intentá con otro término de búsqueda</p>
                   }
                 </div>
               } @else {
-                <ul class="divide-y divide-gray-100">
+                <ul class="divide-y divide-slate-100">
                   @for (good of filteredGoods(); track good.id) {
-                    <li class="px-5 py-3 hover:bg-purple-50 transition-colors" [class.bg-blue-50]="isInCart(good.id)">
+                    <li class="px-5 py-3 transition-colors hover:bg-violet-50/50" [ngClass]="{'bg-blue-50': isInCart(good.id)}">
                       <div class="flex items-center gap-3">
-
-                        <!-- Product info -->
-                        <div class="flex-1 min-w-0">
-                          <p class="text-sm font-semibold text-gray-900 truncate">{{ good.productName }}</p>
-                          <div class="flex items-center gap-2 mt-0.5">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                        <div class="min-w-0 flex-1">
+                          <p class="truncate text-sm font-semibold text-slate-900">{{ good.productName }}</p>
+                          <div class="mt-0.5 flex flex-wrap items-center gap-2">
+                            <span class="inline-flex items-center rounded-full border border-slate-200/60 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-600">
                               {{ good.colorName }}
                             </span>
-                            <span class="text-xs text-gray-500">
-                              Stock: <span class="font-semibold text-green-700">{{ getEffectiveStock(good.id, good.quantityUnits) }}</span> u
+                            <span class="text-xs text-slate-500">
+                              Stock: <strong class="text-emerald-700">{{ getEffectiveStock(good.id, good.quantityUnits) }}</strong> u
                             </span>
-                            <span class="text-xs text-gray-400">|</span>
-                            <span class="text-xs text-gray-500">
-                              Precio: <span class="font-medium">{{ good.unit_price | currency:'ARS':'symbol':'1.2-2' }}</span>
+                            <span class="text-xs text-slate-400">·</span>
+                            <span class="text-xs text-slate-500">
+                              {{ good.unit_price | currency:'ARS':'symbol':'1.2-2' }}
                             </span>
                           </div>
                         </div>
-
-                        <!-- Add control -->
-                        <div class="flex items-center gap-2 flex-shrink-0">
-                          <input
-                            type="number"
-                            min="1"
-                            [max]="getEffectiveStock(good.id, good.quantityUnits)"
-                            [ngModel]="getQtyInput(good.id)"
-                            (ngModelChange)="setQtyInput(good.id, $event)"
+                        <div class="flex flex-shrink-0 items-center gap-2">
+                          <input type="number" min="1" [max]="getEffectiveStock(good.id, good.quantityUnits)"
+                            [ngModel]="getQtyInput(good.id)" (ngModelChange)="setQtyInput(good.id, $event)"
                             [disabled]="getEffectiveStock(good.id, good.quantityUnits) <= 0"
-                            class="w-16 rounded-md border border-gray-300 text-center text-sm py-1.5 px-1 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 disabled:bg-gray-100 disabled:text-gray-400"
-                          />
-                          <button
-                            (click)="addToCart(good)"
+                            class="w-14 rounded-lg border border-slate-200 bg-slate-50 py-1.5 px-2 text-center text-sm text-slate-900 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 disabled:bg-slate-100 disabled:text-slate-400 transition-colors" />
+                          <button (click)="addToCart(good)"
                             [disabled]="getEffectiveStock(good.id, good.quantityUnits) <= 0 || getQtyInput(good.id) < 1"
-                            class="px-3 py-1.5 rounded-md text-xs font-semibold text-white transition-colors
-                                   bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-purple-500
-                                   disabled:bg-gray-300 disabled:cursor-not-allowed">
+                            class="rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 transition-colors disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400">
                             @if (isInCart(good.id)) {
                               + Sumar
                             } @else {
@@ -353,7 +286,6 @@ interface FinishedGoodDisplay {
                             }
                           </button>
                         </div>
-
                       </div>
                     </li>
                   }

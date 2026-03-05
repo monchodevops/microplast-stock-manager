@@ -9,75 +9,107 @@ import { InventoryService, ProductDefinition } from '../../services/inventory.se
   imports: [CommonModule, FormsModule],
   template: `
     <div class="space-y-6 relative">
-      <!-- Success Message -->
-      @if (showSuccessMessage()) {
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative animate-fade-in">
-          <span class="block sm:inline">{{ successMessage() }}</span>
-          <button (click)="showSuccessMessage.set(false)" class="absolute top-0 bottom-0 right-0 px-4 py-3">
-            <svg class="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-              <title>Close</title>
-              <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
-            </svg>
-          </button>
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="mb-0.5 text-[11px] font-semibold uppercase tracking-widest text-slate-400">Producción</p>
+          <h1 class="text-xl font-semibold text-slate-900">Recetas / Configuración</h1>
         </div>
-      }
-      
-      <div class="flex justify-between items-center">
-        <h2 class="text-2xl font-bold text-gray-800">Recetas (Definiciones de Producto)</h2>
-        <button (click)="isEditing = true; clearForm()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm transition-colors">
+        <button (click)="isEditing = true; clearForm()"
+          class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
           Nueva Receta
         </button>
       </div>
 
+      <!-- Success Message -->
+      @if (showSuccessMessage()) {
+        <div class="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+          <svg class="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <span class="flex-1 text-sm text-emerald-800">{{ successMessage() }}</span>
+          <button (click)="showSuccessMessage.set(false)" class="text-emerald-400 hover:text-emerald-600 transition-colors">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+      }
+
       <!-- Editor Form -->
       @if (isEditing) {
-        <div class="bg-white p-6 rounded-lg shadow border border-blue-200 animate-fade-in">
-          <h3 class="font-medium text-lg text-gray-900 mb-4">{{ editingId ? 'Editar' : 'Crear' }} Producto</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div class="rounded-xl border border-blue-200/60 bg-white p-6">
+          <p class="mb-4 text-xs font-semibold uppercase tracking-wider text-slate-400">{{ editingId ? 'Editar' : 'Crear' }} Producto</p>
+          <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label class="block text-sm text-gray-700 mb-1">Nombre</label>
-              <input [(ngModel)]="formName" class="w-full p-2 border border-gray-600 rounded bg-white text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ej. Tanque 500L">
+              <label class="mb-1 block text-xs font-medium text-slate-600">Nombre</label>
+              <input [(ngModel)]="formName" placeholder="Ej. Tanque 500L"
+                class="block w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors" />
             </div>
             <div>
-              <label class="block text-sm text-gray-700 mb-1">Categoría</label>
-              <input [(ngModel)]="formCategory" class="w-full p-2 border border-gray-600 rounded bg-white text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ej. Tanques">
+              <label class="mb-1 block text-xs font-medium text-slate-600">Categoría</label>
+              <input [(ngModel)]="formCategory" placeholder="Ej. Tanques"
+                class="block w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors" />
             </div>
-            <div class="md:col-span-2">
-              <label class="block text-sm text-gray-700 mb-1">Consumo de Plástico (kg por unidad)</label>
-              <input type="number" [(ngModel)]="formConsumption" class="w-full p-2 border border-gray-600 rounded bg-white text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="0.0">
+            <div class="sm:col-span-2">
+              <label class="mb-1 block text-xs font-medium text-slate-600">Consumo de Plástico (kg por unidad)</label>
+              <input type="number" [(ngModel)]="formConsumption" placeholder="0.0"
+                class="block w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors" />
             </div>
           </div>
-          <div class="flex justify-end space-x-3">
-            <button (click)="isEditing = false" class="text-gray-600 hover:bg-gray-100 px-4 py-2 rounded">Cancelar</button>
-            <button (click)="saveProduct()" [disabled]="isSaving" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 shadow-sm disabled:opacity-50">
-              {{ isSaving ? 'Guardando...' : 'Guardar Receta' }}
+          <div class="flex justify-end gap-2">
+            <button (click)="isEditing = false"
+              class="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors">
+              Cancelar
+            </button>
+            <button (click)="saveProduct()" [disabled]="isSaving"
+              class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors disabled:opacity-50">
+              @if (isSaving) {
+                <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                Guardando…
+              } @else {
+                Guardar Receta
+              }
             </button>
           </div>
         </div>
       }
 
-      <!-- List -->
+      <!-- Product Card Grid -->
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         @for (product of inventory.products(); track product.id) {
-          <div class="bg-white rounded-lg shadow p-6 border border-gray-200 hover:shadow-md transition-shadow relative group">
-            <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2">
-              <button (click)="editProduct(product)" class="text-blue-600 hover:text-blue-800 text-sm font-medium p-1 bg-white bg-opacity-80 rounded hover:bg-gray-100">Editar</button>
-              <button (click)="askDelete(product)" class="text-red-600 hover:text-red-800 text-sm font-medium p-1 bg-white bg-opacity-80 rounded hover:bg-gray-100">Borrar</button>
+          <div class="group relative rounded-xl border border-slate-200/60 bg-white p-5 transition-shadow hover:shadow-sm">
+            <!-- Hover Actions -->
+            <div class="absolute right-4 top-4 flex gap-1.5 opacity-0 transition-opacity group-hover:opacity-100">
+              <button (click)="editProduct(product)"
+                class="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors">
+                Editar
+              </button>
+              <button (click)="askDelete(product)"
+                class="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors">
+                Borrar
+              </button>
             </div>
-            <div class="flex items-center space-x-3 mb-4">
-              <div class="bg-blue-100 p-2 rounded-lg text-blue-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            <!-- Card Content -->
+            <div class="mb-4 flex items-center gap-3">
+              <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-blue-200/60 bg-blue-50 text-blue-600">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
               </div>
-              <div>
-                <h3 class="text-lg font-bold text-gray-900">{{ product.name }}</h3>
-                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-gray-100 text-gray-600">{{ product.category }}</span>
+              <div class="min-w-0">
+                <h3 class="truncate text-sm font-semibold text-slate-900">{{ product.name }}</h3>
+                <span class="inline-flex items-center rounded-full border border-slate-200/60 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-600">
+                  {{ product.category }}
+                </span>
               </div>
             </div>
-            <div class="text-sm text-gray-600">
-              <p>Consumo por unidad:</p>
-              <p class="text-2xl font-bold text-gray-900">{{ product.consumptionPerUnitKg | number:'1.0-2' }} <span class="text-sm font-normal text-gray-500">kg</span></p>
+            <div class="border-t border-slate-100 pt-3">
+              <p class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Consumo por unidad</p>
+              <p class="mt-0.5 text-2xl font-bold tracking-tight text-slate-900">
+                {{ product.consumptionPerUnitKg | number:'1.0-2' }}
+                <span class="text-sm font-normal text-slate-400">kg</span>
+              </p>
             </div>
           </div>
         }
@@ -85,25 +117,29 @@ import { InventoryService, ProductDefinition } from '../../services/inventory.se
 
       <!-- Delete Confirmation Modal -->
       @if (showDeleteConfirm) {
-        <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center backdrop-blur-sm">
-          <div class="relative bg-white rounded-lg shadow-xl p-8 max-w-sm w-full border border-gray-200 animate-fade-in text-center">
-            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-              <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+          <div class="w-full max-w-sm rounded-2xl border border-slate-200/50 bg-white p-6 shadow-xl text-center">
+            <div class="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full border border-red-200/60 bg-red-50">
+              <svg class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
-            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-2">Eliminar Producto</h3>
-            <p class="text-sm text-gray-500 mb-4">
-              ¿Está seguro de querer eliminar este producto?
-            </p>
-            <p class="font-bold text-gray-800 mb-6">{{ deleteTargetName }}</p>
-            
-            <div class="flex justify-center space-x-3">
-              <button (click)="showDeleteConfirm = false" class="bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 px-4 py-2 rounded text-sm font-medium transition-colors">
+            <h3 class="mb-1 text-base font-semibold text-slate-900">Eliminar Producto</h3>
+            <p class="mb-1 text-sm text-slate-500">¿Está seguro de querer eliminar este producto?</p>
+            <p class="mb-5 text-sm font-semibold text-slate-800">{{ deleteTargetName }}</p>
+            <div class="flex justify-center gap-2">
+              <button (click)="showDeleteConfirm = false"
+                class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
                 Cancelar
               </button>
-              <button (click)="confirmDelete()" [disabled]="isDeleting" class="bg-red-600 text-white hover:bg-red-700 px-4 py-2 rounded text-sm font-medium shadow-sm transition-colors disabled:opacity-50">
-                {{ isDeleting ? 'Eliminando...' : 'Eliminar' }}
+              <button (click)="confirmDelete()" [disabled]="isDeleting"
+                class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors disabled:opacity-50">
+                @if (isDeleting) {
+                  <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                  Eliminando…
+                } @else {
+                  Eliminar
+                }
               </button>
             </div>
           </div>

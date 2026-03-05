@@ -8,97 +8,104 @@ import { ActivityHistoryModalComponent } from './activity-history-modal.componen
   standalone: true,
   imports: [CommonModule, ActivityHistoryModalComponent],
   template: `
-    <div class="space-y-6 animate-fade-in">
-      <h2 class="text-2xl font-bold text-gray-800">Panel de Control</h2>
+    <div class="space-y-6">
+
+      <!-- Page Header -->
+      <div>
+        <p class="mb-0.5 text-[11px] font-semibold uppercase tracking-widest text-slate-400">General</p>
+        <h1 class="text-xl font-semibold text-slate-900">Panel de Control</h1>
+      </div>
 
       <!-- Alerts Section -->
       @if (inventory.lowStockAlerts().length > 0) {
-        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded shadow-sm">
-          <div class="flex items-center mb-2">
-            <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-              </svg>
-            </div>
-            <div class="ml-3">
-              <h3 class="text-lg leading-6 font-medium text-red-800">Alerta de Stock Bajo</h3>
-            </div>
+        <div class="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
+          <svg class="mt-0.5 h-5 w-5 flex-shrink-0 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+          <div class="min-w-0">
+            <p class="text-sm font-semibold text-red-800">Alerta de Stock Bajo</p>
+            <ul class="mt-1.5 space-y-1">
+              @for (alert of inventory.lowStockAlerts(); track alert.id) {
+                <li class="text-sm text-red-700">
+                  <span class="font-medium">{{ alert.colorName }}:</span>
+                  Solo {{ alert.currentStockKg | number:'1.0-2' }}kg restantes
+                  <span class="text-red-500">(límite: {{ alert.alertThresholdKg }}kg)</span>
+                </li>
+              }
+            </ul>
           </div>
-          <ul class="list-disc list-inside text-red-700 ml-5 space-y-1">
-            @for (alert of inventory.lowStockAlerts(); track alert.id) {
-              <li>
-                <span class="font-bold">{{ alert.colorName }}:</span> 
-                Solo {{ alert.currentStockKg | number:'1.0-2' }}kg restantes 
-                (Límite: {{ alert.alertThresholdKg }}kg)
-              </li>
-            }
-          </ul>
         </div>
       } @else {
-        <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded shadow-sm flex items-center">
-          <svg class="h-5 w-5 text-green-500 mr-3" viewBox="0 0 20 20" fill="currentColor">
-             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+        <div class="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+          <svg class="h-5 w-5 flex-shrink-0 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
           </svg>
-          <span class="text-green-800 font-medium">Niveles de stock saludables.</span>
+          <span class="text-sm font-medium text-emerald-800">Niveles de stock saludables.</span>
         </div>
       }
 
       <!-- KPI Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white p-6 rounded-lg shadow border border-gray-100">
-          <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Materia Prima</p>
-          <p class="mt-2 text-3xl font-bold text-gray-900">{{ inventory.totalRawMaterialStock() | number:'1.0-0' }} <span class="text-sm text-gray-500 font-normal">kg</span></p>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div class="rounded-xl border border-slate-200/60 bg-white p-5">
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400">Total Materia Prima</p>
+          <p class="mt-2 text-3xl font-bold tracking-tight text-slate-900">
+            {{ inventory.totalRawMaterialStock() | number:'1.0-0' }}
+            <span class="text-base font-normal text-slate-400">kg</span>
+          </p>
         </div>
-        <div class="bg-white p-6 rounded-lg shadow border border-gray-100">
-          <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Unidades Terminadas</p>
-          <p class="mt-2 text-3xl font-bold text-blue-600">{{ inventory.totalFinishedUnits() | number:'1.0-0' }} <span class="text-sm text-gray-500 font-normal">u</span></p>
+        <div class="rounded-xl border border-slate-200/60 bg-white p-5">
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400">Unidades Terminadas</p>
+          <p class="mt-2 text-3xl font-bold tracking-tight text-blue-600">
+            {{ inventory.totalFinishedUnits() | number:'1.0-0' }}
+            <span class="text-base font-normal text-slate-400">u</span>
+          </p>
         </div>
-        <div class="bg-white p-6 rounded-lg shadow border border-gray-100">
-          <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Tipos de Productos</p>
-          <p class="mt-2 text-3xl font-bold text-gray-900">{{ inventory.products().length }}</p>
+        <div class="rounded-xl border border-slate-200/60 bg-white p-5">
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400">Tipos de Productos</p>
+          <p class="mt-2 text-3xl font-bold tracking-tight text-slate-900">{{ inventory.products().length }}</p>
         </div>
       </div>
 
       <!-- Recent Logs -->
-      <div class="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
-        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-          <h3 class="text-lg font-medium text-gray-900">Actividad Reciente</h3>
+      <div class="overflow-hidden rounded-xl border border-slate-200/60 bg-white">
+        <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+          <h3 class="text-sm font-semibold text-slate-800">Actividad Reciente</h3>
           <button
             (click)="openActivityModal()"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold text-sm rounded-lg shadow-md hover:from-blue-700 hover:to-blue-800 hover:shadow-lg transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
           >
-            <span>Ver más</span>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
             </svg>
+            Ver historial
           </button>
         </div>
         <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead class="bg-gray-50">
-              <tr>
-                <th scope="col" class="w-32 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                <th scope="col" class="w-40 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
-                <th scope="col" class="w-24 px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Cambio</th>
+          <table class="min-w-full divide-y divide-slate-100 table-fixed">
+            <thead>
+              <tr class="bg-slate-50/60">
+                <th scope="col" class="w-32 px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400">Fecha</th>
+                <th scope="col" class="w-40 px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400">Tipo</th>
+                <th scope="col" class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400">Descripción</th>
+                <th scope="col" class="w-24 px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-400">Cambio</th>
               </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody class="divide-y divide-slate-100 bg-white">
               @for (log of inventory.logs().slice(0, 5); track log.id) {
-                <tr class="hover:bg-gray-50">
-                  <td class="w-32 px-6 py-4 text-sm text-gray-500">
+                <tr class="hover:bg-slate-50/50 transition-colors">
+                  <td class="w-32 px-4 py-3.5 text-sm text-slate-500">
                     <div class="truncate">{{ log.createdAt | date:'short' }}</div>
                   </td>
-                  <td class="w-40 px-6 py-4 text-sm">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                  <td class="w-40 px-4 py-3.5 text-sm">
+                    <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium"
                           [class]="getTransactionTypeClasses(log.transactionType)">
                       {{ getTransactionTypeDisplay(log.transactionType) }}
                     </span>
                   </td>
-                  <td class="px-6 py-4 text-sm text-gray-900">
+                  <td class="px-4 py-3.5 text-sm text-slate-800">
                     <div class="break-words leading-tight">{{ log.description }}</div>
                   </td>
-                  <td class="w-24 px-6 py-4 text-sm text-right font-medium" 
+                  <td class="w-24 px-4 py-3.5 text-right text-sm font-medium"
                       [class]="getAmountChangeClasses(log)">
                     <div class="truncate">{{ formatAmountChange(log) }}</div>
                   </td>
@@ -108,7 +115,7 @@ import { ActivityHistoryModalComponent } from './activity-history-modal.componen
           </table>
         </div>
         @if (inventory.logs().length === 0) {
-          <div class="text-center py-8 text-gray-500">
+          <div class="py-10 text-center text-sm text-slate-400">
             No hay actividad registrada
           </div>
         }
@@ -167,17 +174,17 @@ export class DashboardComponent {
     switch (type) {
       case 'INCOMING_MATERIAL': 
       case 'AJUSTE_MATERIA_PRIMA':
-        return 'bg-green-100 text-green-800';
+        return 'border-emerald-200/60 bg-emerald-50 text-emerald-700';
       case 'PRODUCTION_RUN': 
-        return 'bg-blue-100 text-blue-800';
+        return 'border-blue-200/60 bg-blue-50 text-blue-700';
       case 'DISPATCH': 
-        return 'bg-red-100 text-red-800';
+        return 'border-red-200/60 bg-red-50 text-red-700';
       case 'AJUSTE_PRODUCTOS':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'border-amber-200/60 bg-amber-50 text-amber-700';
       case 'PRECIO': 
-        return 'bg-purple-100 text-purple-800';
+        return 'border-violet-200/60 bg-violet-50 text-violet-700';
       default: 
-        return 'bg-gray-100 text-gray-800';
+        return 'border-slate-200/60 bg-slate-50 text-slate-600';
     }
   }
 

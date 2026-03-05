@@ -7,58 +7,58 @@ import { InventoryService } from '../../services/inventory.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="p-6 bg-white min-h-screen">
-      <!-- Header del Reporte -->
-      <div class="flex justify-between items-start mb-8 border-b pb-4">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900">Reporte de Producción</h1>
-          <p class="text-gray-500 mt-1">Fecha: {{ currentDate | date:'dd/MM/yyyy HH:mm':'es' }}</p>
-        </div>
-        <div class="text-right print:hidden">
-          <button (click)="printReport()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md transition-colors flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2-2v4h10z" />
-            </svg> Imprimir y Registrar
-          </button>
+    <div class="space-y-6">
 
+      <!-- Page Header -->
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="mb-0.5 text-[11px] font-semibold uppercase tracking-widest text-slate-400">General</p>
+          <h1 class="text-xl font-semibold text-slate-900">Reporte Diario</h1>
+          <p class="mt-0.5 text-xs text-slate-400">{{ currentDate | date:'dd/MM/yyyy HH:mm' }}</p>
         </div>
+        <button (click)="printReport()" class="print:hidden inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          </svg>
+          Imprimir y Registrar
+        </button>
       </div>
 
-      <!-- Tabla de Producción -->
-      <div class="overflow-hidden border rounded-lg">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Producto</th>
-              <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Color</th>
-              <th class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Total Día</th>
-              <th class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider bg-yellow-50">Novedad / Reciente</th>
-              <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Verificación</th>
+      <!-- Table -->
+      <div class="overflow-hidden rounded-xl border border-slate-200/60 bg-white">
+        <table class="min-w-full divide-y divide-slate-100">
+          <thead>
+            <tr class="bg-slate-50/60">
+              <th class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400">Producto</th>
+              <th class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400">Color</th>
+              <th class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-400">Total Día</th>
+              <th class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-amber-500 bg-amber-50/40">Novedad / Reciente</th>
+              <th class="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-slate-400">Verificación</th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
+          <tbody class="divide-y divide-slate-100 bg-white">
             @for (item of reportData(); track item.productName + item.colorName) {
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ item.productName }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.colorName }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-bold">{{ item.totalDay }} un.</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-right bg-yellow-50">
+              <tr class="hover:bg-slate-50/50">
+                <td class="px-4 py-3.5 text-sm font-medium text-slate-900">{{ item.productName }}</td>
+                <td class="px-4 py-3.5 text-sm text-slate-500">{{ item.colorName }}</td>
+                <td class="px-4 py-3.5 text-right text-sm font-bold text-slate-900">{{ item.totalDay }} <span class="font-normal text-slate-400">un.</span></td>
+                <td class="px-4 py-3.5 text-right bg-amber-50/30">
                   @if (item.newSinceCutoff > 0) {
-                    <span class="text-green-600 font-bold bg-green-50 px-2 py-1 rounded border border-green-200 fa-fade">
+                    <span class="inline-flex items-center rounded-full border border-emerald-200/60 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
                       + {{ item.newSinceCutoff }} un.
                     </span>
                   } @else {
-                    <span class="text-gray-400">-</span>
+                    <span class="text-slate-300">—</span>
                   }
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-center">
-                  <div class="w-6 h-6 border border-gray-300 rounded mx-auto"></div>
+                <td class="px-4 py-3.5 text-center">
+                  <div class="mx-auto h-5 w-5 rounded border border-slate-300"></div>
                 </td>
               </tr>
             }
             @if (reportData().length === 0) {
               <tr>
-                <td colspan="5" class="px-6 py-8 text-center text-gray-500 italic">
+                <td colspan="5" class="px-4 py-10 text-center text-sm italic text-slate-400">
                   No hay producción registrada para el día de hoy.
                 </td>
               </tr>
@@ -67,15 +67,16 @@ import { InventoryService } from '../../services/inventory.service';
         </table>
       </div>
 
-      <!-- Footer para Firmas -->
-      <div class="mt-12 grid grid-cols-2 gap-10 print:mt-20">
-        <div class="border-t border-gray-400 pt-2 text-center text-sm text-gray-600">
+      <!-- Signature Footer -->
+      <div class="mt-8 grid grid-cols-2 gap-10 print:mt-20">
+        <div class="border-t border-slate-300 pt-2 text-center text-xs text-slate-500">
           Firma Responsable Producción
         </div>
-        <div class="border-t border-gray-400 pt-2 text-center text-sm text-gray-600">
+        <div class="border-t border-slate-300 pt-2 text-center text-xs text-slate-500">
           Firma Recibe Stock (Logística)
         </div>
       </div>
+
     </div>
   `
 })

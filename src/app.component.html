@@ -1,107 +1,175 @@
+<!-- Mobile backdrop -->
+@if (sidebarOpen()) {
+  <div class="fixed inset-0 z-20 bg-black/50 lg:hidden" (click)="closeSidebar()"></div>
+}
+
 <div class="flex h-screen bg-gray-100 print:h-auto print:overflow-visible">
 
   <!-- Sidebar -->
-  <aside class="w-64 bg-slate-900 text-white flex flex-col shadow-xl z-10 print:hidden">
-    <div class="h-16 flex items-center justify-center border-b border-slate-800 bg-slate-850">
-      <div class="flex items-center space-x-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+  <aside
+    class="fixed inset-y-0 left-0 z-30 flex w-64 flex-col flex-shrink-0 bg-slate-900 border-r border-white/[0.06] transition-transform duration-200 ease-in-out lg:static lg:inset-auto lg:z-auto lg:translate-x-0 print:hidden"
+    [class.-translate-x-full]="!sidebarOpen()">
+
+    <!-- Logo -->
+    <div class="flex h-16 flex-shrink-0 items-center gap-3 px-5 border-b border-white/[0.06]">
+      <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-blue-600">
+        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
             d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
         </svg>
-        <span class="text-xl font-bold tracking-wider">ROTO<span class="text-blue-500">SYS</span></span>
       </div>
+      <span class="text-base font-bold tracking-widest text-white">ROTO<span class="text-blue-400">SYS</span></span>
     </div>
 
-    <nav class="flex-1 px-2 py-6 space-y-2 overflow-y-auto">
-      <a routerLink="/dashboard" routerLinkActive="bg-slate-800 text-white active-link" [routerLinkActiveOptions]="{exact: true}"
-        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
-        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-slate-400 group-[.active-link]:text-blue-500 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-        </svg>
-        Dashboard
-      </a>
+    <!-- Navigation -->
+    <nav class="flex-1 overflow-y-auto px-3 py-5 space-y-5">
 
-      <a routerLink="/production" routerLinkActive="bg-slate-800 text-white active-link"
-        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
-        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-slate-400 group-[.active-link]:text-blue-500 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        Registrar Producción
-      </a>
+      <!-- General -->
+      <div>
+        <p class="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-slate-500">General</p>
+        <div class="space-y-0.5">
+          <a routerLink="/dashboard" routerLinkActive="bg-slate-800/60 text-blue-400 border-blue-500"
+            [routerLinkActiveOptions]="{exact: true}"
+            class="flex items-center gap-3 rounded-lg border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-slate-400 transition-all duration-150 hover:bg-slate-800/40 hover:text-slate-200 cursor-pointer"
+            (click)="closeSidebar()">
+            <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+            Dashboard
+          </a>
+          <a routerLink="/report" routerLinkActive="bg-slate-800/60 text-blue-400 border-blue-500"
+            class="flex items-center gap-3 rounded-lg border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-slate-400 transition-all duration-150 hover:bg-slate-800/40 hover:text-slate-200 cursor-pointer"
+            (click)="closeSidebar()">
+            <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Reporte Diario
+          </a>
+        </div>
+      </div>
 
-      <a routerLink="/raw-materials" routerLinkActive="bg-slate-800 text-white active-link"
-        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
-        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-slate-400 group-[.active-link]:text-blue-500 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-        </svg>
-        Materia Prima
-      </a>
+      <!-- Producción -->
+      <div>
+        <p class="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-slate-500">Producción</p>
+        <div class="space-y-0.5">
+          <a routerLink="/production" routerLinkActive="bg-slate-800/60 text-blue-400 border-blue-500"
+            class="flex items-center gap-3 rounded-lg border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-slate-400 transition-all duration-150 hover:bg-slate-800/40 hover:text-slate-200 cursor-pointer"
+            (click)="closeSidebar()">
+            <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Registrar Producción
+          </a>
+          <a routerLink="/recipes" routerLinkActive="bg-slate-800/60 text-blue-400 border-blue-500"
+            class="flex items-center gap-3 rounded-lg border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-slate-400 transition-all duration-150 hover:bg-slate-800/40 hover:text-slate-200 cursor-pointer"
+            (click)="closeSidebar()">
+            <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Recetas / Config
+          </a>
+        </div>
+      </div>
 
-      <a routerLink="/finished-goods" routerLinkActive="bg-slate-800 text-white active-link"
-        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
-        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-slate-400 group-[.active-link]:text-blue-500 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-        </svg>
-        Productos Terminados
-      </a>
+      <!-- Inventario -->
+      <div>
+        <p class="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-slate-500">Inventario</p>
+        <div class="space-y-0.5">
+          <a routerLink="/raw-materials" routerLinkActive="bg-slate-800/60 text-blue-400 border-blue-500"
+            class="flex items-center gap-3 rounded-lg border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-slate-400 transition-all duration-150 hover:bg-slate-800/40 hover:text-slate-200 cursor-pointer"
+            (click)="closeSidebar()">
+            <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+            Materia Prima
+          </a>
+          <a routerLink="/finished-goods" routerLinkActive="bg-slate-800/60 text-blue-400 border-blue-500"
+            class="flex items-center gap-3 rounded-lg border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-slate-400 transition-all duration-150 hover:bg-slate-800/40 hover:text-slate-200 cursor-pointer"
+            (click)="closeSidebar()">
+            <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+            </svg>
+            Productos Terminados
+          </a>
+        </div>
+      </div>
 
-      <a routerLink="/dispatch" routerLinkActive="bg-slate-800 text-white active-link"
-        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
-        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-slate-400 group-[.active-link]:text-green-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-        </svg>
-        Generar Remito
-      </a>
+      <!-- Despacho -->
+      <div>
+        <p class="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-slate-500">Despacho</p>
+        <div class="space-y-0.5">
+          <a routerLink="/dispatch" routerLinkActive="bg-slate-800/60 text-blue-400 border-blue-500"
+            class="flex items-center gap-3 rounded-lg border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-slate-400 transition-all duration-150 hover:bg-slate-800/40 hover:text-slate-200 cursor-pointer"
+            (click)="closeSidebar()">
+            <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
+            Generar Remito
+          </a>
+          <a routerLink="/historial-remitos" routerLinkActive="bg-slate-800/60 text-blue-400 border-blue-500"
+            class="flex items-center gap-3 rounded-lg border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-slate-400 transition-all duration-150 hover:bg-slate-800/40 hover:text-slate-200 cursor-pointer"
+            (click)="closeSidebar()">
+            <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Historial de Remitos
+          </a>
+        </div>
+      </div>
 
-      <a routerLink="/historial-remitos" routerLinkActive="bg-slate-800 text-white active-link"
-        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
-        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-slate-400 group-[.active-link]:text-purple-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        Historial de Remitos
-      </a>
-
-      <a routerLink="/recipes" routerLinkActive="bg-slate-800 text-white active-link"
-        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
-        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-slate-400 group-[.active-link]:text-blue-500 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-        Recetas / Config
-      </a>
-
-      <a routerLink="/report" routerLinkActive="bg-slate-800 text-white active-link"
-        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
-        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-slate-400 group-[.active-link]:text-blue-500 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        Reporte Diario
-      </a>
     </nav>
 
-    <div class="p-4 border-t border-slate-800">
-      <div class="flex items-center">
-        <div class="ml-3">
-          <p class="text-sm font-medium text-white">Admin</p>
-          <p class="text-xs font-medium text-slate-400">Planta Principal</p>
+    <!-- User footer -->
+    <div class="flex-shrink-0 border-t border-white/[0.06] p-4">
+      <div class="flex items-center gap-3">
+        <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-blue-500/25 bg-blue-500/10">
+          <span class="text-xs font-semibold text-blue-400">A</span>
+        </div>
+        <div class="min-w-0">
+          <p class="truncate text-sm font-medium text-slate-200">Admin</p>
+          <p class="truncate text-xs text-slate-500">Planta Principal</p>
         </div>
       </div>
     </div>
+
   </aside>
 
-  <!-- Main Content -->
-  <main
-    class="flex-1 overflow-y-auto focus:outline-none bg-gray-100 print:h-auto print:overflow-visible print:bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <router-outlet></router-outlet>
-    </div>
-  </main>
+  <!-- Content area -->
+  <div class="flex flex-1 flex-col min-w-0">
+
+    <!-- Mobile top bar -->
+    <header class="flex flex-shrink-0 items-center h-14 gap-3 border-b border-slate-800/60 bg-slate-900 px-4 lg:hidden print:hidden">
+      <button (click)="toggleSidebar()"
+        class="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-800 hover:text-slate-200">
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+      <div class="flex items-center gap-2">
+        <div class="flex h-6 w-6 items-center justify-center rounded bg-blue-600">
+          <svg class="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+          </svg>
+        </div>
+        <span class="text-sm font-bold tracking-widest text-white">ROTO<span class="text-blue-400">SYS</span></span>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto bg-gray-100 focus:outline-none print:h-auto print:overflow-visible print:bg-white">
+      <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+
+  </div>
 </div>

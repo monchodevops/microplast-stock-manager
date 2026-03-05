@@ -9,15 +9,22 @@ import { InventoryService } from '../../services/inventory.service';
   imports: [CommonModule, FormsModule],
   template: `
     <div class="space-y-6">
-      <h2 class="text-2xl font-bold text-gray-800">Registrar Producción</h2>
 
-      <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 max-w-2xl">
+      <!-- Page Header -->
+      <div>
+        <p class="mb-0.5 text-[11px] font-semibold uppercase tracking-widest text-slate-400">Producción</p>
+        <h1 class="text-xl font-semibold text-slate-900">Registrar Producción</h1>
+      </div>
+
+      <div class="max-w-2xl rounded-xl border border-slate-200/60 bg-white p-6">
         <div class="space-y-4">
+
           <!-- Product Selector -->
           <div>
-            <label class="block text-sm font-medium text-gray-700">Producto</label>
-            <select [(ngModel)]="selectedProductId" class="mt-1 block w-full rounded-md bg-white border-gray-600 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border">
-              <option value="">Seleccionar Producto...</option>
+            <label class="mb-1 block text-xs font-medium text-slate-600">Producto</label>
+            <select [(ngModel)]="selectedProductId"
+              class="block w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors">
+              <option value="">Seleccionar producto…</option>
               @for (product of inventory.products(); track product.id) {
                 <option [value]="product.id">{{ product.name }} ({{ product.consumptionPerUnitKg }}kg/u)</option>
               }
@@ -26,9 +33,10 @@ import { InventoryService } from '../../services/inventory.service';
 
           <!-- Color Selector -->
           <div>
-            <label class="block text-sm font-medium text-gray-700">Color (Materia Prima)</label>
-            <select [(ngModel)]="selectedColorName" class="mt-1 block w-full rounded-md bg-white border-gray-600 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border">
-              <option value="">Seleccionar Color...</option>
+            <label class="mb-1 block text-xs font-medium text-slate-600">Color (Materia Prima)</label>
+            <select [(ngModel)]="selectedColorName"
+              class="block w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors">
+              <option value="">Seleccionar color…</option>
               @for (material of inventory.rawMaterials(); track material.id) {
                 <option [value]="material.colorName">{{ material.colorName }} (Disp: {{ material.currentStockKg }}kg)</option>
               }
@@ -37,44 +45,60 @@ import { InventoryService } from '../../services/inventory.service';
 
           <!-- Quantity Input -->
           <div>
-            <label class="block text-sm font-medium text-gray-700">Cantidad a Producir (Unidades)</label>
-            <input type="number" [(ngModel)]="quantity" min="1" class="mt-1 block w-full rounded-md bg-white border-gray-600 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border">
+            <label class="mb-1 block text-xs font-medium text-slate-600">Cantidad a Producir (Unidades)</label>
+            <input type="number" [(ngModel)]="quantity" min="1"
+              class="block w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors" />
           </div>
-          
-          <!-- Summary/Preview -->
+
+          <!-- Summary Preview -->
           @if (selectedProductId() && quantity() > 0) {
-            <div class="bg-gray-50 p-4 rounded text-sm text-gray-700 border border-gray-200">
-              <p><strong>Resumen de Consumo:</strong></p>
-              <div class="flex justify-between mt-1">
+            <div class="rounded-lg border border-slate-200/60 bg-slate-50/60 p-4 text-sm">
+              <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Resumen de Consumo</p>
+              <div class="flex justify-between text-slate-600">
                 <span>Consumo unitario:</span>
                 <span>{{ getSelectedProductConsumption() }} kg</span>
               </div>
-              <div class="flex justify-between mt-1 font-bold text-gray-900 pt-2 border-t border-gray-200">
+              <div class="mt-2 flex justify-between border-t border-slate-200 pt-2 font-semibold text-slate-900">
                 <span>Total Plástico Requerido:</span>
                 <span>{{ (getSelectedProductConsumption() * quantity()) | number:'1.0-2' }} kg</span>
               </div>
             </div>
           }
 
-          <!-- Actions -->
-          <div class="pt-4">
-            <button (click)="submitProduction()" 
-                    [disabled]="!isValid() || isLoading()"
-                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
+          <!-- Submit Button -->
+          <div class="pt-2">
+            <button (click)="submitProduction()"
+              [disabled]="!isValid() || isLoading()"
+              class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors disabled:cursor-not-allowed disabled:opacity-50">
               @if (isLoading()) {
-                Procesando...
+                <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                Procesando…
               } @else {
                 Registrar Producción
               }
             </button>
           </div>
 
-          <!-- Feedback Messages -->
+          <!-- Feedback -->
           @if (feedbackMessage()) {
-            <div class="mt-4 p-4 rounded-md" [class.bg-red-50]="!lastSuccess()" [class.text-red-700]="!lastSuccess()" [class.bg-green-50]="lastSuccess()" [class.text-green-700]="lastSuccess()">
-              {{ feedbackMessage() }}
+            <div class="flex items-start gap-3 rounded-xl border p-4"
+              [class.border-emerald-200]="lastSuccess()"
+              [class.bg-emerald-50]="lastSuccess()"
+              [class.border-red-200]="!lastSuccess()"
+              [class.bg-red-50]="!lastSuccess()">
+              <svg class="mt-0.5 h-4 w-4 flex-shrink-0" [class.text-emerald-500]="lastSuccess()" [class.text-red-500]="!lastSuccess()" viewBox="0 0 20 20" fill="currentColor">
+                @if (lastSuccess()) {
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                } @else {
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                }
+              </svg>
+              <span class="text-sm" [class.text-emerald-800]="lastSuccess()" [class.text-red-800]="!lastSuccess()">
+                {{ feedbackMessage() }}
+              </span>
             </div>
           }
+
         </div>
       </div>
     </div>

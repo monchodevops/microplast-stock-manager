@@ -9,126 +9,97 @@ import { InventoryService, LogFilter, PaginatedLogsResult, ProductionLog } from 
   standalone: true,
   imports: [CommonModule, FormsModule, DataGridComponent],
   template: `
-    <!-- Modal Backdrop -->
     @if (isOpen) {
-      <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" (click)="closeModal()">
-        <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-6xl shadow-lg rounded-md bg-white" (click)="$event.stopPropagation()">
-          
+      <!-- Modal Backdrop -->
+      <div class="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-4 pt-16 backdrop-blur-sm" (click)="closeModal()">
+        <div class="w-full max-w-5xl rounded-2xl border border-slate-200/50 bg-white shadow-xl" (click)="$event.stopPropagation()">
+
           <!-- Modal Header -->
-          <div class="flex justify-between items-center pb-3 border-b border-gray-200">
-            <h3 class="text-xl font-semibold text-gray-900 pl-2">Historial de Actividad Completo</h3>
-            <button 
-              type="button" 
+          <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+            <div>
+              <h3 class="text-base font-semibold text-slate-900">Historial de Actividad</h3>
+              <p class="text-xs text-slate-400 mt-0.5">Registro completo de movimientos</p>
+            </div>
+            <button
+              type="button"
               (click)="closeModal()"
-              class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+              class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
           <!-- Filter Section -->
-          <div class="pt-4 pb-4 border-b border-gray-200">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-              
-              <!-- Date From -->
+          <div class="border-b border-slate-100 px-6 py-4">
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Desde</label>
-                <input
-                  type="date"
-                  [(ngModel)]="startDateStr"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                />
+                <label class="mb-1 block text-xs font-medium text-slate-600">Desde</label>
+                <input type="date" [(ngModel)]="startDateStr"
+                  class="block w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors" />
               </div>
-
-              <!-- Date To -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Hasta</label>
-                <input
-                  type="date"
-                  [(ngModel)]="endDateStr"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                />
+                <label class="mb-1 block text-xs font-medium text-slate-600">Hasta</label>
+                <input type="date" [(ngModel)]="endDateStr"
+                  class="block w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors" />
               </div>
-
-              <!-- Transaction Type Filter -->
-              <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tipos de Transacción</label>
-                <div class="grid grid-cols-2 gap-2">
+              <div class="sm:col-span-2">
+                <label class="mb-1 block text-xs font-medium text-slate-600">Tipos de Transacción</label>
+                <div class="grid grid-cols-2 gap-1.5">
                   @for (type of availableTypes; track type.value) {
-                    <label class="inline-flex items-center">
-                      <input
-                        type="checkbox"
-                        [value]="type.value"
-                        [checked]="selectedTypes.includes(type.value)"
+                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" [value]="type.value" [checked]="selectedTypes.includes(type.value)"
                         (change)="onTypeChange(type.value, $event)"
-                        class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                      />
-                      <span class="ml-2 text-sm"
-                            [class]="getTransactionTypeClasses(type.value)">
-                        {{ getTransactionTypeDisplay(type.value) }}
-                      </span>
+                        class="rounded border-slate-300 text-blue-600 focus:ring-blue-500/30" />
+                      <span class="text-xs text-slate-700">{{ getTransactionTypeDisplay(type.value) }}</span>
                     </label>
                   }
                 </div>
               </div>
             </div>
-
-            <!-- Action Buttons -->
-            <div class="mt-4 flex gap-3">
-              <button
-                (click)="applyFilters()"
-                [disabled]="isLoading()"
-                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm"
-              >
+            <div class="mt-3 flex gap-2">
+              <button (click)="applyFilters()" [disabled]="isLoading()"
+                class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 @if (isLoading()) {
-                  <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
                 }
                 Filtrar
               </button>
-
-              <button
-                (click)="clearFilters()"
-                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-sm"
-              >
+              <button (click)="clearFilters()"
+                class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors">
                 Limpiar
               </button>
             </div>
           </div>
 
-          <!-- Content Area -->
-          <div class="pt-4 max-h-96 overflow-y-auto">
+          <!-- Content -->
+          <div class="max-h-96 overflow-y-auto px-6 py-4">
             @if (isLoading()) {
-              <div class="flex justify-center items-center py-8">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <span class="ml-3 text-gray-600">Cargando actividad...</span>
+              <div class="flex items-center justify-center py-10 gap-3 text-slate-500">
+                <span class="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-blue-500"></span>
+                <span class="text-sm">Cargando actividad...</span>
               </div>
             } @else {
-              <!-- Data Grid -->
-              <app-data-grid
-                [data]="logsResult()?.logs || []"
-                [columns]="columns"
-              >
+              <app-data-grid [data]="logsResult()?.logs || []" [columns]="columns">
                 <ng-template #cellTemplate let-log let-col="col">
                   @switch (col.key) {
                     @case ('createdAt') {
-                      <div class="text-sm text-gray-500 truncate">
+                      <div class="text-sm text-slate-500">
                         <div>{{ log.createdAt | date:'dd/MM/yyyy' }}</div>
-                        <div class="text-xs">{{ log.createdAt | date:'HH:mm:ss' }}</div>
+                        <div class="text-xs text-slate-400">{{ log.createdAt | date:'HH:mm:ss' }}</div>
                       </div>
                     }
                     @case ('transactionType') {
-                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                      <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium"
                             [class]="getTransactionTypeClasses(log.transactionType)">
                         {{ getTransactionTypeDisplay(log.transactionType) }}
                       </span>
                     }
                     @case ('description') {
-                      <div class="text-sm text-gray-900 break-words leading-tight">{{ log.description }}</div>
+                      <div class="text-sm text-slate-800 break-words leading-tight">{{ log.description }}</div>
                     }
                     @case ('amountChange') {
-                      <div class="text-sm font-medium text-right truncate"
-                            [class]="getAmountChangeClasses(log)">
+                      <div class="text-sm font-medium text-right truncate" [class]="getAmountChangeClasses(log)">
                         {{ formatAmountChange(log) }}
                       </div>
                     }
@@ -140,70 +111,37 @@ import { InventoryService, LogFilter, PaginatedLogsResult, ProductionLog } from 
 
           <!-- Pagination -->
           @if (logsResult() && logsResult()!.totalCount > 0 && !isLoading()) {
-            <div class="pt-4 border-t border-gray-200">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                  <span class="text-sm text-gray-700">
-                    Mostrando {{ getStartRecord() }}-{{ getEndRecord() }} de {{ logsResult()!.totalCount }} registros
-                  </span>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                  <button
-                    (click)="goToFirstPage()"
-                    [disabled]="!logsResult()!.hasPreviousPage"
-                    title="Primera página"
-                    class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
-                    </svg>
-                  </button>
-                  
-                  <button
-                    (click)="goToPreviousPage()"
-                    [disabled]="!logsResult()!.hasPreviousPage"
-                    title="Página anterior"
-                    class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                  </button>
-                  
-                  <span class="px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded">
-                    {{ logsResult()!.currentPage }} / {{ logsResult()!.totalPages }}
-                  </span>
-                  
-                  <button
-                    (click)="goToNextPage()"
-                    [disabled]="!logsResult()!.hasNextPage"
-                    title="Página siguiente"
-                    class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                    </svg>
-                  </button>
-                  
-                  <button
-                    (click)="goToLastPage()"
-                    [disabled]="!logsResult()!.hasNextPage"
-                    title="Última página"
-                    class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
-                    </svg>
-                  </button>
-                </div>
+            <div class="flex items-center justify-between border-t border-slate-100 px-6 py-3">
+              <span class="text-xs text-slate-500">
+                Mostrando {{ getStartRecord() }}–{{ getEndRecord() }} de {{ logsResult()!.totalCount }} registros
+              </span>
+              <div class="flex items-center gap-1">
+                <button (click)="goToFirstPage()" [disabled]="!logsResult()!.hasPreviousPage"
+                  class="rounded-lg border border-slate-200 p-1.5 text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                  <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+                </button>
+                <button (click)="goToPreviousPage()" [disabled]="!logsResult()!.hasPreviousPage"
+                  class="rounded-lg border border-slate-200 p-1.5 text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                  <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <span class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700">
+                  {{ logsResult()!.currentPage }} / {{ logsResult()!.totalPages }}
+                </span>
+                <button (click)="goToNextPage()" [disabled]="!logsResult()!.hasNextPage"
+                  class="rounded-lg border border-slate-200 p-1.5 text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                  <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+                <button (click)="goToLastPage()" [disabled]="!logsResult()!.hasNextPage"
+                  class="rounded-lg border border-slate-200 p-1.5 text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                  <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+                </button>
               </div>
             </div>
           }
 
           @if (logsResult() && logsResult()!.totalCount === 0 && !isLoading()) {
-            <div class="text-center py-8">
-              <p class="text-gray-500">No se encontraron registros que coincidan con los filtros.</p>
+            <div class="border-t border-slate-100 py-10 text-center text-sm text-slate-400">
+              No se encontraron registros con los filtros aplicados.
             </div>
           }
 
@@ -383,17 +321,17 @@ export class ActivityHistoryModalComponent implements OnChanges {
     switch (type) {
       case 'INCOMING_MATERIAL': 
       case 'AJUSTE_MATERIA_PRIMA':
-        return 'bg-green-100 text-green-800';
+        return 'border-emerald-200/60 bg-emerald-50 text-emerald-700';
       case 'PRODUCTION_RUN': 
-        return 'bg-blue-100 text-blue-800';
+        return 'border-blue-200/60 bg-blue-50 text-blue-700';
       case 'DISPATCH': 
-        return 'bg-red-100 text-red-800';
+        return 'border-red-200/60 bg-red-50 text-red-700';
       case 'AJUSTE_PRODUCTOS':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'border-amber-200/60 bg-amber-50 text-amber-700';
       case 'PRECIO': 
-        return 'bg-purple-100 text-purple-800';
+        return 'border-violet-200/60 bg-violet-50 text-violet-700';
       default: 
-        return 'bg-gray-100 text-gray-800';
+        return 'border-slate-200/60 bg-slate-50 text-slate-600';
     }
   }
 
