@@ -41,7 +41,7 @@ export interface ColumnDef {
         </thead>
         <tbody class="divide-y divide-slate-100 bg-white">
             @for (item of sortedData; track item.id || $index) {
-                <tr class="hover:bg-slate-50/50 transition-colors">
+                <tr class="hover:bg-slate-50/50 transition-colors" [ngClass]="rowClass ? rowClass(item) : ''">
                     @for (col of columns; track col.key) {
                         <td class="px-4 py-3.5 text-sm"
                             [class]="col.width || ''"
@@ -70,6 +70,7 @@ export interface ColumnDef {
 export class DataGridComponent {
     @Input() data: any[] = [];
     @Input() columns: ColumnDef[] = [];
+    @Input() rowClass?: (item: any) => string;
 
     @ContentChild('cellTemplate') cellTemplate?: TemplateRef<any>;
 

@@ -58,7 +58,10 @@ export class InventoryService {
 
   // Computed Signals
   readonly lowStockAlerts = computed(() => {
-    return this.rawMaterials().filter(m => m.currentStockKg <= m.alertThresholdKg);
+    return this.rawMaterials().filter(m =>
+      m.currentStockKg <= m.alertThresholdKg &&
+      !(m.currentStockKg === 0 && m.alertThresholdKg === 0)
+    );
   });
 
   readonly totalRawMaterialStock = computed(() => {

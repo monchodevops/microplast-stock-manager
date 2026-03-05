@@ -85,7 +85,7 @@ import { DataGridComponent, ColumnDef } from '../shared/data-grid.component';
         </div>
       }
 
-      <app-data-grid [data]="inventory.rawMaterials()" [columns]="columns">
+      <app-data-grid [data]="inventory.rawMaterials()" [columns]="columns" [rowClass]="getRowClass">
         <ng-template #cellTemplate let-item let-col="col">
           @switch (col.key) {
             @case ('currentStockKg') {
@@ -95,7 +95,11 @@ import { DataGridComponent, ColumnDef } from '../shared/data-grid.component';
               <span class="text-slate-500">{{ item.alertThresholdKg | number:'1.0-0' }} kg</span>
             }
             @case ('status') {
-              @if (item.currentStockKg <= item.alertThresholdKg && item.alertThresholdKg > 0) {
+              @if (item.currentStockKg === 0 && item.alertThresholdKg === 0) {
+                <span class="inline-flex items-center gap-1 rounded-full border border-slate-200/60 bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-500">
+                  Dado de baja
+                </span>
+              } @else if (item.currentStockKg <= item.alertThresholdKg && item.alertThresholdKg > 0) {
                 <span class="inline-flex items-center gap-1 rounded-full border border-red-200/60 bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700">
                   ⚠ Bajo Stock
                 </span>
@@ -201,7 +205,7 @@ export class RawMaterialsComponent {
         { key: 'colorName', label: 'Color', sortable: true, align: 'left' },
         { key: 'currentStockKg', label: 'Stock Actual', sortable: true, align: 'right' },
         { key: 'alertThresholdKg', label: 'Alerta (Mín)', sortable: true, align: 'right' },
-        { key: 'status', label: 'Estado', sortable: true, align: 'center', sortValue: (item: RawMaterial) => (item.currentStockKg <= item.alertThresholdKg && item.alertThresholdKg > 0) ? 1 : 2 },
+        { key: 'status', label: 'Estado', sortable: true, align: 'center', sortValue: (item: RawMaterial) => { if (item.currentStockKg === 0 && item.alertThresholdKg === 0) return 3; return (item.currentStockKg <= item.alertThresholdKg && item.alertThresholdKg > 0) ? 1 : 2; } },
         { key: 'actions', label: 'Acciones', align: 'center' }
     ];
 
@@ -287,6 +291,14 @@ export class RawMaterialsComponent {
             this.isSavingGlobal = false;
         }
     }
+
+    isDeactivated(item: RawMaterial): boolean {
+        return item.currentStockKg === 0 && item.alertThresholdKg === 0;
+    }
+
+    getRowClass = (item: RawMaterial): string => {
+        return this.isDeactivated(item) ? 'opacity-40 grayscale' : '';
+    };
 
     openEdit(material: RawMaterial) {
         this.editingMaterialId = material.id;
