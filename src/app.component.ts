@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -10,6 +11,9 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
   styleUrls: []
 })
 export class AppComponent {
+  readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+
   sidebarOpen = signal(false);
 
   toggleSidebar() {
@@ -18,5 +22,10 @@ export class AppComponent {
 
   closeSidebar() {
     this.sidebarOpen.set(false);
+  }
+
+  async logout(): Promise<void> {
+    await this.auth.signOut();
+    this.router.navigate(['/login']);
   }
 }
