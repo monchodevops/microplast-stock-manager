@@ -12,7 +12,7 @@ ALTER TYPE transaction_type ADD VALUE IF NOT EXISTS 'DISPATCH';
 --    Almacena el encabezado de cada remito generado.
 CREATE TABLE IF NOT EXISTS dispatch_orders (
   id               UUID          PRIMARY KEY DEFAULT uuid_generate_v4(),
-  order_number     TEXT          UNIQUE NOT NULL,  -- Ej: REM-20260228-153022 (YYYYMMDD-HHMMSS)
+  order_number     TEXT          UNIQUE NOT NULL,  -- Ej: REM-20260228-001 (YYYYMMDD-NNN secuencial por día)
   client_reason    TEXT          NOT NULL,
   delivery_person  TEXT          NOT NULL,
   total_amount     NUMERIC(12,2) NOT NULL DEFAULT 0,

@@ -98,22 +98,55 @@ export class DispatchService {
 
       const _now = new Date();
       const _p = (n: number, len = 2) => String(n).padStart(len, '0');
-      const orderNumber = `REM-${_now.getFullYear()}${_p(_now.getMonth() + 1)}${_p(_now.getDate())}-${_p(_now.getHours())}${_p(_now.getMinutes())}${_p(_now.getSeconds())}`;
+      const dateStr = `${_now.getFullYear()}${_p(_now.getMonth() + 1)}${_p(_now.getDate())}`;
 
-      const { data: orderRow, error: orderError } = await supabase
-        .from('dispatch_orders')
-        .insert({
-          order_number:    orderNumber,
-          client_reason:   orderData.clientReason,
-          delivery_person: orderData.deliveryPerson,
-          total_amount:    totalAmount
-        })
-        .select('id')
-        .single();
+      // ── Sequential number per day with retry on UNIQUE conflicts ───────
+      // Query the count of remitos already created today to derive the next
+      // sequence number.  On concurrent inserts the UNIQUE constraint on
+      // order_number guarantees no duplicates: we catch error code 23505
+      // (unique_violation) and retry with the updated count.
+      let orderRow: { id: string } | null = null;
+      let orderId!: string;
+      let orderNumber!: string;
 
-      if (orderError) throw new Error(`Error al crear el remito: ${orderError.message}`);
+      const MAX_RETRIES = 10;
+      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+        const { count, error: countError } = await supabase
+          .from('dispatch_orders')
+          .select('id', { count: 'exact', head: true })
+          .like('order_number', `REM-${dateStr}-%`);
 
-      const orderId: string = orderRow.id;
+        if (countError) throw new Error(`Error al obtener numeración del remito: ${countError.message}`);
+
+        const seq = (count ?? 0) + 1;
+        orderNumber = `REM-${dateStr}-${String(seq).padStart(3, '0')}`;
+
+        const { data: insertedRow, error: orderError } = await supabase
+          .from('dispatch_orders')
+          .insert({
+            order_number:    orderNumber,
+            client_reason:   orderData.clientReason,
+            delivery_person: orderData.deliveryPerson,
+            total_amount:    totalAmount
+          })
+          .select('id')
+          .single();
+
+        if (!orderError) {
+          orderRow = insertedRow;
+          orderId  = orderRow!.id;
+          break;
+        }
+
+        // 23505 = unique_violation → another user took this number; retry
+        if ((orderError as any).code === '23505') continue;
+
+        throw new Error(`Error al crear el remito: ${orderError.message}`);
+      }
+
+      if (!orderRow) {
+        throw new Error('No se pudo generar un número de remito único. Intente nuevamente.');
+      }
 
       // ── STEP 2: Insert detail lines ─────────────────────────────────────
       const itemRows = cartItems.map(item => ({

@@ -13,6 +13,7 @@ export interface ProductDefinition {
   name: string;
   consumptionPerUnitKg: number;
   category: string;
+  layersConfig?: Array<{ order: number; consumptionKg: number }> | null;
 }
 
 export interface FinishedGood {
@@ -109,7 +110,11 @@ export class InventoryService {
           id: d.id,
           name: d.name,
           consumptionPerUnitKg: d.consumption_per_unit_kg,
-          category: d.category
+          category: d.category,
+          layersConfig: d.layers_config
+            ? (d.layers_config as Array<{ order: number; consumption_kg: number }>)
+                .map(l => ({ order: l.order, consumptionKg: l.consumption_kg }))
+            : null
         })));
       }
 
@@ -444,10 +449,15 @@ export class InventoryService {
 
   async updateProductDefinition(product: ProductDefinition) {
     try {
+      const layersConfigDb = product.layersConfig
+        ? product.layersConfig.map(l => ({ order: l.order, consumption_kg: l.consumptionKg }))
+        : null;
+
       const dbPayload = {
         name: product.name,
         category: product.category,
         consumption_per_unit_kg: product.consumptionPerUnitKg,
+        layers_config: layersConfigDb,
         deleted_at: null // Ensure it's active if we are saving/updating it
       };
 

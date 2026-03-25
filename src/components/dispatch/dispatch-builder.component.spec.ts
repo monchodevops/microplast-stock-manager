@@ -36,7 +36,7 @@ function makeDispatchMock() {
   return {
     createDispatchOrder: vi.fn().mockResolvedValue({
       success:  true,
-      message:  'Remito REM-20260228-153022 generado exitosamente.',
+      message:  'Remito REM-20260228-001 generado exitosamente.',
       orderId:  'order-uuid-123',
     }),
   };
@@ -194,7 +194,7 @@ describe('DispatchBuilderComponent', () => {
 
     // Positive feedback message
     expect(component.lastSuccess()).toBe(true);
-    expect(component.feedbackMessage()).toContain('REM-20260228-153022');
+    expect(component.feedbackMessage()).toContain('REM-20260228-001');
 
     // Form fields should be cleared
     expect(component.clientReason()).toBe('');

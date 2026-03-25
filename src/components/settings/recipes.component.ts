@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InventoryService, ProductDefinition } from '../../services/inventory.service';
@@ -48,14 +48,58 @@ import { InventoryService, ProductDefinition } from '../../services/inventory.se
             </div>
             <div>
               <label class="mb-1 block text-xs font-medium text-slate-600">Categoría</label>
-              <input [(ngModel)]="formCategory" placeholder="Ej. Tanques"
-                class="block w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors" />
+              <select [(ngModel)]="formCategory"
+                class="block w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors">
+                <option value="">Seleccionar categoría…</option>
+                @for (cat of categories; track cat) {
+                  <option [value]="cat">{{ cat }}</option>
+                }
+              </select>
             </div>
-            <div class="sm:col-span-2">
-              <label class="mb-1 block text-xs font-medium text-slate-600">Consumo de Plástico (kg por unidad)</label>
-              <input type="number" [(ngModel)]="formConsumption" placeholder="0.0"
-                class="block w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors" />
-            </div>
+
+            <!-- ===== TANQUES: multi-layer config ===== -->
+            @if (isTanquesCategory()) {
+              <div class="sm:col-span-2">
+                <label class="mb-1 block text-xs font-medium text-slate-600">Número de Capas</label>
+                <div class="flex gap-2">
+                  @for (n of [1, 2, 3]; track n) {
+                    <button type="button"
+                      (click)="setLayerCount(n)"
+                      [class]="formLayerCount === n
+                        ? 'flex-1 rounded-lg border-2 border-blue-500 bg-blue-50 py-2 text-sm font-semibold text-blue-700 transition-colors'
+                        : 'flex-1 rounded-lg border border-slate-200 bg-slate-50 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors'">
+                      {{ n === 1 ? 'Monocapa' : n === 2 ? 'Bicapa' : 'Tricapa' }}
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <!-- Layer consumption fields -->
+              @for (layer of formLayers; track layer.order; let i = $index) {
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-slate-600">
+                    Consumo Capa {{ layer.order }} (kg/unidad)
+                  </label>
+                  <input type="number" [(ngModel)]="formLayers[i].consumptionKg" min="0" step="0.01"
+                    placeholder="0.0"
+                    class="block w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors" />
+                </div>
+              }
+
+              <!-- Auto-computed total -->
+              <div class="sm:col-span-2 flex items-center gap-3 rounded-lg border border-slate-200/60 bg-slate-50/60 px-4 py-3">
+                <span class="text-xs font-medium text-slate-500">Consumo Total por Unidad:</span>
+                <span class="text-sm font-bold text-slate-900">{{ totalLayerConsumption() | number:'1.0-2' }} kg</span>
+                <span class="text-xs text-slate-400">(suma de todas las capas)</span>
+              </div>
+            } @else {
+              <!-- ===== Non-Tanques: single consumption field ===== -->
+              <div class="sm:col-span-2">
+                <label class="mb-1 block text-xs font-medium text-slate-600">Consumo de Plástico (kg por unidad)</label>
+                <input type="number" [(ngModel)]="formConsumption" placeholder="0.0"
+                  class="block w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors" />
+              </div>
+            }
           </div>
           <div class="flex justify-end gap-2">
             <button (click)="isEditing = false"
@@ -99,17 +143,35 @@ import { InventoryService, ProductDefinition } from '../../services/inventory.se
               </div>
               <div class="min-w-0">
                 <h3 class="truncate text-sm font-semibold text-slate-900">{{ product.name }}</h3>
-                <span class="inline-flex items-center rounded-full border border-slate-200/60 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-600">
-                  {{ product.category }}
-                </span>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="inline-flex items-center rounded-full border border-slate-200/60 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-600">
+                    {{ product.category }}
+                  </span>
+                  @if (product.layersConfig && product.layersConfig.length > 1) {
+                    <span class="inline-flex items-center rounded-full border border-blue-200/60 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">
+                      {{ product.layersConfig.length === 2 ? 'Bicapa' : 'Tricapa' }}
+                    </span>
+                  }
+                </div>
               </div>
             </div>
             <div class="border-t border-slate-100 pt-3">
               <p class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Consumo por unidad</p>
-              <p class="mt-0.5 text-2xl font-bold tracking-tight text-slate-900">
-                {{ product.consumptionPerUnitKg | number:'1.0-2' }}
-                <span class="text-sm font-normal text-slate-400">kg</span>
-              </p>
+              @if (product.layersConfig && product.layersConfig.length > 1) {
+                <!-- Multi-layer breakdown -->
+                @for (layer of product.layersConfig; track layer.order) {
+                  <p class="mt-0.5 text-xs text-slate-500">Capa {{ layer.order }}: <span class="font-semibold text-slate-700">{{ layer.consumptionKg | number:'1.0-2' }} kg</span></p>
+                }
+                <p class="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+                  {{ product.consumptionPerUnitKg | number:'1.0-2' }}
+                  <span class="text-sm font-normal text-slate-400">kg total</span>
+                </p>
+              } @else {
+                <p class="mt-0.5 text-2xl font-bold tracking-tight text-slate-900">
+                  {{ product.consumptionPerUnitKg | number:'1.0-2' }}
+                  <span class="text-sm font-normal text-slate-400">kg</span>
+                </p>
+              }
             </div>
           </div>
         }
@@ -151,14 +213,21 @@ import { InventoryService, ProductDefinition } from '../../services/inventory.se
 export class RecipesComponent {
   inventory = inject(InventoryService);
 
+  readonly categories = ['Macetas', 'Tanques', 'Biodigestores', 'Otros'];
+
   // Edit State
   isEditing = false;
   isSaving = false;
   editingId: string | null = null;
   formName = '';
   formCategory = '';
+  /** Used only for non-Tanques products. */
   formConsumption = 0;
-  
+  /** Number of layers — only relevant when formCategory === 'Tanques'. */
+  formLayerCount = 1;
+  /** Per-layer consumption config — only relevant when formCategory === 'Tanques'. */
+  formLayers: Array<{ order: number; consumptionKg: number }> = [{ order: 1, consumptionKg: 0 }];
+
   // Success message
   showSuccessMessage = signal(false);
   successMessage = signal('');
@@ -169,49 +238,94 @@ export class RecipesComponent {
   deleteTargetId: string | null = null;
   deleteTargetName = '';
 
+  /** True when the category being edited is "Tanques". */
+  isTanquesCategory = computed(() => this.formCategory.trim() === 'Tanques');
+
+  /** Sum of all layer consumptions — displayed as the total for Tanques. */
+  totalLayerConsumption = computed(() =>
+    this.formLayers.reduce((sum, l) => sum + (l.consumptionKg || 0), 0)
+  );
+
   clearForm() {
     this.editingId = null;
     this.formName = '';
     this.formCategory = '';
     this.formConsumption = 0;
+    this.formLayerCount = 1;
+    this.formLayers = [{ order: 1, consumptionKg: 0 }];
+  }
+
+  setLayerCount(n: number) {
+    this.formLayerCount = n;
+    // Grow or trim the layers array, preserving existing values
+    while (this.formLayers.length < n) {
+      this.formLayers = [...this.formLayers, { order: this.formLayers.length + 1, consumptionKg: 0 }];
+    }
+    if (this.formLayers.length > n) {
+      this.formLayers = this.formLayers.slice(0, n);
+    }
   }
 
   editProduct(p: ProductDefinition) {
     this.editingId = p.id;
     this.formName = p.name;
     this.formCategory = p.category;
-    this.formConsumption = p.consumptionPerUnitKg;
+
+    if (p.layersConfig && p.layersConfig.length > 0) {
+      // Multi-layer product — restore layer state
+      this.formLayerCount = p.layersConfig.length;
+      this.formLayers = p.layersConfig.map(l => ({ order: l.order, consumptionKg: l.consumptionKg }));
+      this.formConsumption = p.consumptionPerUnitKg;
+    } else {
+      // Mono-layer or non-Tanques
+      this.formLayerCount = 1;
+      this.formLayers = [{ order: 1, consumptionKg: p.consumptionPerUnitKg }];
+      this.formConsumption = p.consumptionPerUnitKg;
+    }
+
     this.isEditing = true;
   }
 
   async saveProduct() {
-    if (!this.formName || this.formConsumption <= 0) return;
+    const isTanques = this.formCategory.trim() === 'Tanques';
+
+    // Determine effective consumption and layers config
+    let consumptionPerUnitKg: number;
+    let layersConfig: Array<{ order: number; consumptionKg: number }> | null;
+
+    if (isTanques && this.formLayerCount > 1) {
+      consumptionPerUnitKg = this.totalLayerConsumption();
+      layersConfig = this.formLayers.map(l => ({ order: l.order, consumptionKg: l.consumptionKg }));
+    } else if (isTanques && this.formLayerCount === 1) {
+      consumptionPerUnitKg = this.formLayers[0]?.consumptionKg || 0;
+      layersConfig = null; // Mono-layer tanque — no layers_config needed
+    } else {
+      consumptionPerUnitKg = this.formConsumption;
+      layersConfig = null;
+    }
+
+    if (!this.formName || consumptionPerUnitKg <= 0) return;
 
     this.isSaving = true;
     const isNewProduct = !this.editingId;
     const productId = this.editingId || crypto.randomUUID();
-    
+
     try {
-      // Guardar la receta
       await this.inventory.updateProductDefinition({
         id: productId,
         name: this.formName,
         category: this.formCategory,
-        consumptionPerUnitKg: this.formConsumption
+        consumptionPerUnitKg,
+        layersConfig
       });
 
-      // Si es un producto nuevo, crear automáticamente productos terminados
       if (isNewProduct) {
         const result = await this.inventory.createFinishedGoodsForNewRecipe(productId);
         this.successMessage.set(result.message);
         this.showSuccessMessage.set(true);
-        
-        // Auto-ocultar mensaje después de 5 segundos
-        setTimeout(() => {
-          this.showSuccessMessage.set(false);
-        }, 5000);
+        setTimeout(() => this.showSuccessMessage.set(false), 5000);
       }
-      
+
       this.isEditing = false;
     } finally {
       this.isSaving = false;

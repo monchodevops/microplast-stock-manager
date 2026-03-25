@@ -19,9 +19,12 @@ export class AuthService {
   readonly isAuthenticated = computed(() => this.currentUser() !== null);
   readonly isAdmin = computed(() => this.currentProfile()?.role === 'admin');
 
+  /** Promesa que se resuelve cuando la sesión inicial fue hidratada */
+  readonly sessionReady: Promise<void>;
+
   constructor() {
     // Hidratar sesión existente al arrancar
-    supabase.auth.getSession().then(({ data }) => {
+    this.sessionReady = supabase.auth.getSession().then(({ data }) => {
       this.currentUser.set(data.session?.user ?? null);
       if (data.session?.user) {
         this.loadProfile(data.session.user.id);
