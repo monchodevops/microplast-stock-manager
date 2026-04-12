@@ -1,16 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-// ⚠️ CONFIGURACIÓN: Reemplaza estas variables con las de tu proyecto en Supabase
-// Puedes obtenerlas en: Project Settings -> API
-
-// 1. URL del Proyecto (Ya configurada)
-const SUPABASE_URL = 'https://fvbwyhebmfuhsigohwpp.supabase.co';
-
-// 2. API Key
-// IMPORTANTE: Usa la "Publishable Key" (o 'anon' public key).
-// NO uses la 'service_role' key (esa es secreta y no debe ir en el frontend).
-// Si ves "Anon Key (Legacy)", puedes usar esa o la Publishable, son funcionalmente la misma para este caso.
-const SUPABASE_KEY = 'sb_publishable_VBYHxq8PnBO96FxEZe2cfA_TFz-2Yic';
+const SUPABASE_URL = import.meta.env['VITE_SUPABASE_URL'] as string;
+const SUPABASE_KEY = import.meta.env['VITE_SUPABASE_KEY'] as string;
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
