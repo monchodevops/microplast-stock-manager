@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InventoryService, ProductDefinition } from '../../services/inventory.service';
@@ -23,14 +23,26 @@ import { InventoryService, ProductDefinition } from '../../services/inventory.se
         </button>
       </div>
 
-      <!-- Success Message -->
+      <!-- Success / Error Message -->
       @if (showSuccessMessage()) {
-        <div class="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-          <svg class="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+        <div class="flex items-start gap-3 rounded-xl border p-4"
+          [class.border-emerald-200]="!isErrorMessage()"
+          [class.bg-emerald-50]="!isErrorMessage()"
+          [class.border-red-200]="isErrorMessage()"
+          [class.bg-red-50]="isErrorMessage()">
+          <svg class="mt-0.5 h-4 w-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"
+            [class.text-emerald-500]="!isErrorMessage()"
+            [class.text-red-500]="isErrorMessage()">
+            @if (!isErrorMessage()) {
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            } @else {
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            }
           </svg>
-          <span class="flex-1 text-sm text-emerald-800">{{ successMessage() }}</span>
-          <button (click)="showSuccessMessage.set(false)" class="text-emerald-400 hover:text-emerald-600 transition-colors">
+          <span class="flex-1 text-sm"
+            [class.text-emerald-800]="!isErrorMessage()"
+            [class.text-red-800]="isErrorMessage()">{{ successMessage() }}</span>
+          <button (click)="showSuccessMessage.set(false)" class="text-slate-400 hover:text-slate-600 transition-colors">
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
@@ -58,7 +70,7 @@ import { InventoryService, ProductDefinition } from '../../services/inventory.se
             </div>
 
             <!-- ===== TANQUES: multi-layer config ===== -->
-            @if (isTanquesCategory()) {
+            @if (isTanquesCategory) {
               <div class="sm:col-span-2">
                 <label class="mb-1 block text-xs font-medium text-slate-600">Número de Capas</label>
                 <div class="flex gap-2">
@@ -89,7 +101,7 @@ import { InventoryService, ProductDefinition } from '../../services/inventory.se
               <!-- Auto-computed total -->
               <div class="sm:col-span-2 flex items-center gap-3 rounded-lg border border-slate-200/60 bg-slate-50/60 px-4 py-3">
                 <span class="text-xs font-medium text-slate-500">Consumo Total por Unidad:</span>
-                <span class="text-sm font-bold text-slate-900">{{ totalLayerConsumption() | number:'1.0-2' }} kg</span>
+                <span class="text-sm font-bold text-slate-900">{{ totalLayerConsumption | number:'1.0-2' }} kg</span>
                 <span class="text-xs text-slate-400">(suma de todas las capas)</span>
               </div>
             } @else {
@@ -231,6 +243,7 @@ export class RecipesComponent {
   // Success message
   showSuccessMessage = signal(false);
   successMessage = signal('');
+  isErrorMessage = signal(false);
 
   // Delete State
   showDeleteConfirm = false;
@@ -239,12 +252,14 @@ export class RecipesComponent {
   deleteTargetName = '';
 
   /** True when the category being edited is "Tanques". */
-  isTanquesCategory = computed(() => this.formCategory.trim() === 'Tanques');
+  get isTanquesCategory(): boolean {
+    return this.formCategory.trim() === 'Tanques';
+  }
 
   /** Sum of all layer consumptions — displayed as the total for Tanques. */
-  totalLayerConsumption = computed(() =>
-    this.formLayers.reduce((sum, l) => sum + (l.consumptionKg || 0), 0)
-  );
+  get totalLayerConsumption(): number {
+    return this.formLayers.reduce((sum, l) => sum + (l.consumptionKg || 0), 0);
+  }
 
   clearForm() {
     this.editingId = null;
@@ -294,7 +309,7 @@ export class RecipesComponent {
     let layersConfig: Array<{ order: number; consumptionKg: number }> | null;
 
     if (isTanques && this.formLayerCount > 1) {
-      consumptionPerUnitKg = this.totalLayerConsumption();
+      consumptionPerUnitKg = this.totalLayerConsumption;
       layersConfig = this.formLayers.map(l => ({ order: l.order, consumptionKg: l.consumptionKg }));
     } else if (isTanques && this.formLayerCount === 1) {
       consumptionPerUnitKg = this.formLayers[0]?.consumptionKg || 0;
@@ -304,7 +319,22 @@ export class RecipesComponent {
       layersConfig = null;
     }
 
-    if (!this.formName || consumptionPerUnitKg <= 0) return;
+    if (!this.formName.trim()) {
+      this.isErrorMessage.set(true);
+      this.successMessage.set('Por favor, ingresá un nombre para el producto.');
+      this.showSuccessMessage.set(true);
+      return;
+    }
+    if (consumptionPerUnitKg <= 0) {
+      this.isErrorMessage.set(true);
+      this.successMessage.set(
+        isTanques
+          ? 'Ingresá los kg de consumo por capa antes de guardar.'
+          : 'El consumo de plástico debe ser mayor a cero.'
+      );
+      this.showSuccessMessage.set(true);
+      return;
+    }
 
     this.isSaving = true;
     const isNewProduct = !this.editingId;
@@ -319,14 +349,24 @@ export class RecipesComponent {
         layersConfig
       });
 
+      this.isErrorMessage.set(false);
       if (isNewProduct) {
         const result = await this.inventory.createFinishedGoodsForNewRecipe(productId);
         this.successMessage.set(result.message);
         this.showSuccessMessage.set(true);
         setTimeout(() => this.showSuccessMessage.set(false), 5000);
+      } else {
+        this.successMessage.set('Receta actualizada correctamente.');
+        this.showSuccessMessage.set(true);
+        setTimeout(() => this.showSuccessMessage.set(false), 3000);
       }
 
       this.isEditing = false;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Error desconocido';
+      this.isErrorMessage.set(true);
+      this.successMessage.set(`Error al guardar: ${msg}`);
+      this.showSuccessMessage.set(true);
     } finally {
       this.isSaving = false;
     }

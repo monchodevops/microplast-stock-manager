@@ -176,12 +176,18 @@ export class RunProductionCommand {
   ): Promise<void> {
     const layersConfig = request.product.layersConfig!;
 
-    // 1. Update each layer's material stock
+    // 1. Aggregate total consumption per color (handles same color used in multiple layers)
+    const consumptionByColor = new Map<string, number>();
     for (let i = 0; i < layersConfig.length; i++) {
       const color = request.layerColors[i];
-      const material = materialsByColor.get(color)!;
       const consumed = request.calculateMaterialNeededForLayer(i);
-      const newStock = material.calculateStockAfterConsumption(consumed);
+      consumptionByColor.set(color, (consumptionByColor.get(color) ?? 0) + consumed);
+    }
+
+    // 2. Apply one stock update per unique color
+    for (const [color, totalConsumed] of consumptionByColor) {
+      const material = materialsByColor.get(color)!;
+      const newStock = material.calculateStockAfterConsumption(totalConsumed);
       await this.repository.updateMaterialStock(material.id, newStock);
     }
 
