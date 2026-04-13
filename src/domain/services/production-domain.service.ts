@@ -132,11 +132,22 @@ export class ProductionDomainService {
       if (!material) {
         return ValidationResult.failure(`Color "${color}" no disponible en materia prima (Capa ${i + 1})`);
       }
+    }
 
+    // Aggregate total consumption per color (same color can appear in multiple layers)
+    const totalNeededByColor = new Map<string, number>();
+    for (let i = 0; i < layersConfig.length; i++) {
+      const color = request.layerColors[i];
       const needed = request.calculateMaterialNeededForLayer(i);
-      if (!material.hasEnoughStock(needed)) {
+      totalNeededByColor.set(color, (totalNeededByColor.get(color) ?? 0) + needed);
+    }
+
+    // Validate combined stock for each unique color
+    for (const [color, totalNeeded] of totalNeededByColor) {
+      const material = materialsByColor.get(color)!;
+      if (!material.hasEnoughStock(totalNeeded)) {
         return ValidationResult.failure(
-          `Stock insuficiente para Capa ${i + 1} (${color}). Necesario: ${needed.toFixed(2)}kg, Disponible: ${material.currentStockKg.toFixed(2)}kg`
+          `Stock insuficiente para "${color}". Necesario: ${totalNeeded.toFixed(2)}kg, Disponible: ${material.currentStockKg.toFixed(2)}kg`
         );
       }
     }
