@@ -470,6 +470,7 @@ export class InventoryService {
       await this.loadData();
     } catch (err) {
       console.error('Error guardando producto:', err);
+      throw err;
     }
   }
 
