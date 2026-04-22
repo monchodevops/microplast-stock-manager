@@ -186,7 +186,10 @@ export class RunProductionCommand {
 
     // 2. Apply one stock update per unique color
     for (const [color, totalConsumed] of consumptionByColor) {
-      const material = materialsByColor.get(color)!;
+      const material = materialsByColor.get(color);
+      if (!material) {
+        throw new ValidationError(`Material not found for color: ${color}`);
+      }
       const newStock = material.calculateStockAfterConsumption(totalConsumed);
       await this.repository.updateMaterialStock(material.id, newStock);
     }
